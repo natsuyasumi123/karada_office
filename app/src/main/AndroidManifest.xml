@@ -26,12 +26,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name="com.karada.app.egl.EGLActivity"
-                  android:label="@string/egl_render"
-                  android:parentActivityName="com.karada.app.MainActivity">
-
-        </activity>
     </application>
 
 </manifest>

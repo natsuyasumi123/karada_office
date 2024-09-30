@@ -14,15 +14,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import androidx.annotation.*;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -40,8 +40,6 @@ import android.widget.Toast;
 import com.enjoy.karada.MyGLRender;
 import com.enjoy.karada.MyGLSurfaceView;
 import com.karada.app.adapter.MyRecyclerViewAdapter;
-import com.karada.app.audio.AudioCollector;
-import com.karada.app.egl.EGLActivity;
 import com.google.mediapipe.framework.image.BitmapImageBuilder;
 import com.google.mediapipe.framework.image.MPImage;
 import com.google.mediapipe.framework.image.MPImageProperties;
@@ -53,6 +51,9 @@ import com.google.mediapipe.tasks.vision.core.RunningMode;
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker;
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -69,13 +70,15 @@ import static android.opengl.GLSurfaceView.RENDERMODE_CONTINUOUSLY;
 import static com.enjoy.karada.MyGLSurfaceView.* ;
 import static com.enjoy.karada.MyNativeRender.*;
 
-public class MainActivity extends AppCompatActivity implements AudioCollector.Callback, ViewTreeObserver.OnGlobalLayoutListener {
+public class MainActivity extends AppCompatActivity implements ViewTreeObserver.OnGlobalLayoutListener {
     private static final String TAG = "MainActivity";
     private static final String[] REQUEST_PERMISSIONS = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.RECORD_AUDIO,
     };
+
     private static final int PERMISSION_REQUEST_CODE = 1;
+    private static final int PICK_MEDIA_REQUEST = 2;
     private static final String[] SAMPLE_TITLES = {
             "腰KOSHI SHRINK" ,
             "胸MUNE BURST ",
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
     private MyGLSurfaceView mGLSurfaceView;
     private ViewGroup mRootView;
     private int mSampleSelectedIndex = SAMPLE_TYPE_KEY_SHRINK_KOSHI - SAMPLE_TYPE;
-    private AudioCollector mAudioCollector;
+
     private MyGLRender mGLRender = new MyGLRender();
     private SensorManager mSensorManager;
     private PoseLandmarker landmarker ;
@@ -95,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mRootView = (ViewGroup) findViewById(R.id.rootView);
+        mRootView = findViewById(R.id.rootView);
         mRootView.getViewTreeObserver().addOnGlobalLayoutListener(this);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mGLRender.init();
@@ -106,6 +109,15 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
     float minPoseTrackingConfidence = 0.5f;
     float minPosePresenceConfidence = 0.5f;
     RunningMode runningMode  = RunningMode.IMAGE;
+
+
+    private void showDefaultImage(){
+
+        int resId = R.drawable.test ;
+        InputStream fis = this.getResources().openRawResource(resId) ;
+        Bitmap bitmap = loadRGBAImage(fis);
+        mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
+    }
     private void createLandMarker(){
         BaseOptions.Builder baseOptionBuilder = BaseOptions.builder() ;
         baseOptionBuilder.setDelegate(Delegate.CPU) ;
@@ -146,15 +158,9 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
         }
     }
 
-    private void detectImage(){
-        Bitmap rawBitmap = BitmapFactory.decodeFile("/sdcard/Materials/e.jpg") ;
-//        Matrix matrix = new Matrix() ;
-//        matrix.postRotate(0);
-//        matrix.postScale(-1f, 1.0f , rawBitmap.getWidth() , rawBitmap.getHeight()) ;
-//        Bitmap rotatedBitmap = Bitmap.createBitmap(
-//                rawBitmap, 0, 0,
-//                rawBitmap.getWidth(), rawBitmap.getHeight(),
-//                matrix, true) ;
+    private void detectImage(String imagePath){
+
+        Bitmap rawBitmap = BitmapFactory.decodeFile(imagePath) ;
         BitmapImageBuilder imageBuilder = new BitmapImageBuilder(rawBitmap) ;
         MPImage mpImage = imageBuilder.build();
         long frameTime = SystemClock.uptimeMillis() ;
@@ -232,9 +238,45 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
         mGLSurfaceView = new MyGLSurfaceView(this, mGLRender);
         mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
         mRootView.addView(mGLSurfaceView, lp);
+
+        showDefaultImage();
     }
 
 
+    /**
+     *
+     * @param uri
+     * @return nullable
+     */
+    public String getRealPathFromURI(Uri uri) {
+        String path = null;
+        if (Build.VERSION.SDK_INT < 11)
+            path = RealPathUtils.getRealPathFromURI_BelowAPI11(MainActivity.this, uri);
+            // SDK >= 11 && SDK < 19
+        else if (Build.VERSION.SDK_INT < 19)
+            path = RealPathUtils.getRealPathFromURI_API11to18(MainActivity.this, uri);
+            // SDK > 19 (Android 4.4)
+        else
+            path = RealPathUtils.getRealPathFromURI_API19(MainActivity.this, uri);
+        Log.d(TAG, "File Path: " + path);
+        // Get the file instance
+        return path;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_MEDIA_REQUEST && resultCode == RESULT_OK) {
+            if (data != null) {
+                Uri uri = data.getData(); // 获取选中的文件的URI
+                userSelectedPath =  getRealPathFromURI( uri ) ;
+                Log.i("OnActivityResult" , "get file :" + userSelectedPath) ;
+
+
+
+            }
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -264,20 +306,12 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
     @Override
     protected void onPause() {
         super.onPause();
-        if (mAudioCollector != null) {
-            mAudioCollector.unInit();
-            mAudioCollector = null;
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mGLRender.unInit();
-        /*
-        * Once the EGL context gets destroyed all the GL buffers etc will get destroyed with it,
-        * so this is unnecessary.
-        * */
     }
 
     @Override
@@ -294,18 +328,23 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_change_sample) {
             showGLSampleDialog();
+        }else if(id == R.id.action_select_image){
+            selectImage();
         }
         return true;
     }
 
-    @Override
-    public void onAudioBufferCallback(short[] buffer) {
-        Log.e(TAG, "onAudioBufferCallback() called with: buffer[0] = [" + buffer[0] + "]");
-        mGLRender.setAudioData(buffer);
-        //mGLSurfaceView.requestRender();
+
+    private String userSelectedPath = "/sdcard/Materials/e.jpg" ;
+
+    private void selectImage(){
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*"); // 设置选择的文件类型，*/*表示选择所有类型
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        startActivityForResult(Intent.createChooser(intent, "选择图片或视频"), PICK_MEDIA_REQUEST);
+
     }
-
-
 
     private void showGLSampleDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -315,70 +354,15 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
         final AlertDialog dialog = builder.create();
 
         Button confirmBtn = rootView.findViewById(R.id.confirm_btn);
-        confirmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
+        confirmBtn.setOnClickListener(v -> dialog.cancel());
 
         final RecyclerView resolutionsListView = rootView.findViewById(R.id.resolution_list_view);
 
         final MyRecyclerViewAdapter myPreviewSizeViewAdapter = new MyRecyclerViewAdapter(this, Arrays.asList(SAMPLE_TITLES));
         myPreviewSizeViewAdapter.setSelectIndex(mSampleSelectedIndex);
-        myPreviewSizeViewAdapter.addOnItemClickListener(new MyRecyclerViewAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                mRootView.removeView(mGLSurfaceView);
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-                mGLSurfaceView = new MyGLSurfaceView(MainActivity.this, mGLRender);
-                mRootView.addView(mGLSurfaceView, lp);
-
-                int selectIndex = myPreviewSizeViewAdapter.getSelectIndex();
-                myPreviewSizeViewAdapter.setSelectIndex(position);
-                myPreviewSizeViewAdapter.notifyItemChanged(selectIndex);
-                myPreviewSizeViewAdapter.notifyItemChanged(position);
-                mSampleSelectedIndex = position;
-
-                if (mRootView.getWidth() != mGLSurfaceView.getWidth()
-                        || mRootView.getHeight() != mGLSurfaceView.getHeight()) {
-                    mGLSurfaceView.setAspectRatio(mRootView.getWidth(), mRootView.getHeight());
-                }
-
-                mGLRender.setParamsInt(SAMPLE_TYPE, position + SAMPLE_TYPE, 0);
-
-                int sampleType = position + SAMPLE_TYPE;
-
-                detectImage() ;
-                Bitmap tmp;
-                switch (sampleType) {
-
-                    case  SAMPLE_TYPE_KEY_SHRINK_KOSHI:
-                        Bitmap bitmap1= loadRGBAImage(R.drawable.test);
-                        mGLSurfaceView.setAspectRatio(bitmap1.getWidth(), bitmap1.getHeight());
-                        break ;
-                    case  SAMPLE_TYPE_KEY_BIG_BREAST:
-                        Bitmap bitmap3= loadRGBAImage(R.drawable.test);
-                        mGLSurfaceView.setAspectRatio(bitmap3.getWidth(), bitmap3.getHeight());
-                        break ;
-                    case SAMPLE_TYPE_KEY_BIG_EYES:
-                        Bitmap bitmap = loadRGBAImage(R.drawable.yifei);
-                        mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
-                        break;
-                    case SAMPLE_TYPE_KEY_FACE_SLENDER:
-                        Bitmap bitmap2 = loadRGBAImage(R.drawable.test);
-                        mGLSurfaceView.setAspectRatio(bitmap2.getWidth(), bitmap2.getHeight());
-                        Log.w("SAMPLE_TYPE_KEY_FACE_SLENDER" ,"FACE SLENDER " ) ;
-                        break;
-                    default:
-                        break;
-                }
-
-                mGLSurfaceView.requestRender();
-                dialog.cancel();
-            }
+        myPreviewSizeViewAdapter.addOnItemClickListener((view, position) -> {
+            onFuncItemSelected(position);
+            dialog.cancel();
         });
 
         LinearLayoutManager manager = new LinearLayoutManager(this);
@@ -386,15 +370,31 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
         resolutionsListView.setLayoutManager(manager);
 
         resolutionsListView.setAdapter(myPreviewSizeViewAdapter);
-        resolutionsListView.scrollToPosition(mSampleSelectedIndex);
 
         dialog.show();
         dialog.getWindow().setContentView(rootView);
 
     }
 
-    private Bitmap loadRGBAImage(int resId) {
-        InputStream is = this.getResources().openRawResource(resId);
+    private void onFuncItemSelected(int position ){
+        mRootView.removeView(mGLSurfaceView);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+        mGLSurfaceView = new MyGLSurfaceView(MainActivity.this, mGLRender);
+        mRootView.addView(mGLSurfaceView, lp);
+        mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
+        mSampleSelectedIndex = position;
+        if (mRootView.getWidth() != mGLSurfaceView.getWidth()
+                || mRootView.getHeight() != mGLSurfaceView.getHeight()) {
+            mGLSurfaceView.setAspectRatio(mRootView.getWidth(), mRootView.getHeight());
+        }
+        showDefaultImage();
+        mGLRender.setParamsInt(SAMPLE_TYPE, position + SAMPLE_TYPE, 0);
+        mGLSurfaceView.requestRender();
+    }
+
+    private Bitmap loadRGBAImage(InputStream is) {
         Bitmap bitmap;
         try {
             bitmap = BitmapFactory.decodeStream(is);
@@ -404,106 +404,11 @@ public class MainActivity extends AppCompatActivity implements AudioCollector.Ca
                 bitmap.copyPixelsToBuffer(buf);
                 byte[] byteArray = buf.array();
                 mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);
-            }
-        }
-        finally
-        {
-            try
-            {
-                is.close();
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
+            }}
+        finally {try {is.close();} catch(IOException e) {e.printStackTrace();}}
         return bitmap;
     }
 
-    private Bitmap loadRGBAImage(int resId, int index) {
-        InputStream is = this.getResources().openRawResource(resId);
-        Bitmap bitmap;
-        try {
-            bitmap = BitmapFactory.decodeStream(is);
-            if (bitmap != null) {
-                int bytes = bitmap.getByteCount();
-                ByteBuffer buf = ByteBuffer.allocate(bytes);
-                bitmap.copyPixelsToBuffer(buf);
-                byte[] byteArray = buf.array();
-                mGLRender.setImageDataWithIndex(index, IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);
-            }
-        }
-        finally
-        {
-            try
-            {
-                is.close();
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        return bitmap;
-    }
-
-    private void loadNV21Image() {
-        InputStream is = null;
-        try {
-            is = getAssets().open("YUV_Image_840x1074.NV21");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int lenght = 0;
-        try {
-            lenght = is.available();
-            byte[] buffer = new byte[lenght];
-            is.read(buffer);
-            mGLRender.setImageData(IMAGE_FORMAT_NV21, 840, 1074, buffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try
-            {
-                is.close();
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    private void loadGrayImage() {
-        InputStream is = null;
-        try {
-            is = getAssets().open("lye_1280x800.Gray");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int lenght = 0;
-        try {
-            lenght = is.available();
-            byte[] buffer = new byte[lenght];
-            is.read(buffer);
-            mGLRender.setImageDataWithIndex(0, IMAGE_FORMAT_GARY, 1280, 800, buffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try
-            {
-                is.close();
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     protected boolean hasPermissionsGranted(String[] permissions) {
         for (String permission : permissions) {
