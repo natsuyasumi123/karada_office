@@ -1,6 +1,3 @@
-//
-// Created by Administrator on 2018/2/10.
-//
 
 #include "LogUtil.h"
 #include "EglCore.h"

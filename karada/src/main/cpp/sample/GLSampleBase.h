@@ -1,10 +1,4 @@
-/**
- *
- * Created by 公众号：字节流动 on 2021/3/12.
- * https://github.com/githubhaohao/NDK_OpenGLES_3_0
- * 最新文章首发于公众号：字节流动，有疑问或者技术交流可以添加微信 Byte-Flow ,领取视频教程, 拉你进技术交流群
- *
- * */
+
 
 #ifndef NDK_OPENGLES_3_0_GLSAMPLEBASE_H
 #define NDK_OPENGLES_3_0_GLSAMPLEBASE_H
@@ -70,6 +64,9 @@ public:
 
 	virtual void Destroy() = 0;
 
+
+//	void setBuhinData(float *data , int size ) ;
+
 protected:
 	GLuint m_VertexShader;
 	GLuint m_FragmentShader;
@@ -77,7 +74,18 @@ protected:
 	MySyncLock m_Lock;
 	int m_SurfaceWidth;
 	int m_SurfaceHeight;
+	float mbuhinData[33 * 3 ]  = {0.0f};
+	int buhinSize ;
 };
+
+
+//void GLSampleBase::setBuhinData(float *data , int size){
+//	for(int index = 0 ; index < size ; index ++ ){
+//		mbuhinData[index] = data[index] ;
+//	}
+//	buhinSize = size ;
+//}
+
 
 
 #endif //NDK_OPENGLES_3_0_GLSAMPLEBASE_H

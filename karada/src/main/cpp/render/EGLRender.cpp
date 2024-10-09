@@ -1,6 +1,4 @@
-//
-// Created by karada on 2019/7/17.
-//
+
 
 #include <LogUtil.h>
 #include <GLUtils.h>
@@ -302,6 +300,9 @@ const GLfloat vFboTexCoors[] = {
 		1.0f, 1.0f,  // top right
 };
 
+
+
+
 const GLushort indices[] = { 0, 1, 2, 1, 3, 2 };
 
 EGLRender::EGLRender()
@@ -570,10 +571,10 @@ void EGLRender::SetImageData(uint8_t *pData, int width, int height)
 			glBindTexture(GL_TEXTURE_2D, GL_NONE);
 			glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
 		}
-
 	}
-
 }
+
+
 
 void EGLRender::SetIntParams(int paramType, int param)
 {

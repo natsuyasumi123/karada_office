@@ -5,6 +5,10 @@ import static com.enjoy.karada.MyNativeRender.*;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import com.google.mediapipe.tasks.components.containers.NormalizedLandmark;
+
+import java.util.List;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -52,34 +56,13 @@ public class MyGLRender implements GLSurfaceView.Renderer {
         mNativeRender.native_SetParamsInt(paramType, value0, value1);
     }
 
-    public void setTouchLoc(float x, float y)
-    {
-        mNativeRender.native_SetParamsFloat(SAMPLE_TYPE_SET_TOUCH_LOC, x, y);
-    }
-
-    public void setGravityXY(float x, float y) {
-        mNativeRender.native_SetParamsFloat(SAMPLE_TYPE_SET_GRAVITY_XY, x, y);
-    }
-
     public void setImageData(int format, int width, int height, byte[] bytes) {
         mNativeRender.native_SetImageData(format, width, height, bytes);
     }
 
-    public void setImageDataWithIndex(int index, int format, int width, int height, byte[] bytes) {
-        mNativeRender.native_SetImageDataWithIndex(index, format, width, height, bytes);
+    public void setMarksData(float[][]  poseData , float[][]  faceData){
+        mNativeRender.native_SetMarkData(poseData, faceData) ;
     }
 
-    public void setAudioData(short[] audioData) {
-        mNativeRender.native_SetAudioData(audioData);
-    }
-
-    public int getSampleType() {
-        return mSampleType;
-    }
-
-    public void updateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
-    {
-        mNativeRender.native_UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
-    }
 
 }

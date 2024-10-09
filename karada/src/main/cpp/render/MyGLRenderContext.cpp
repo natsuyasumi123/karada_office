@@ -1,68 +1,17 @@
-//
-// Created by karada on 2019/7/9.
-//
 
-#include <TriangleSample.h>
-#include <TextureMapSample.h>
-#include <NV21TextureMapSample.h>
-#include <VaoSample.h>
-#include <FBOSample.h>
-#include <FBOLegLengthenSample.h>
-#include <CoordSystemSample.h>
-#include <BasicLightingSample.h>
-#include <TransformFeedbackSample.h>
-#include <MultiLightsSample.h>
-#include <DepthTestingSample.h>
-#include <InstancingSample.h>
-#include <Instancing3DSample.h>
-#include <StencilTestingSample.h>
-#include <BlendingSample.h>
-#include <ParticlesSample.h>
-#include <Noise3DSample.h>
-#include <SkyBoxSample.h>
-#include <Model3DSample.h>
-#include <PBOSample.h>
-#include <BeatingHeartSample.h>
-#include <CloudSample.h>
-#include <TimeTunnelSample.h>
-#include <BezierCurveSample.h>
-#include <BigEyesSample.h>
-#include <FaceSlenderSample.h>
-#include <BigHeadSample.h>
-#include <RotaryHeadSample.h>
-#include <VisualizeAudioSample.h>
-#include <ScratchCardSample.h>
-#include <AvatarSample.h>
-#include <ShockWaveSample.h>
-#include <MRTSample.h>
-#include <FBOBlitSample.h>
-#include <TextureBufferSample.h>
-#include <UniformBufferSample.h>
-#include <RGB2YUYVSample.h>
-#include <SharedEGLContextSample.h>
-#include <TextRenderSample.h>
-#include <PortraitStayColorExample.h>
-#include <GLTransitionExample.h>
-#include <GLTransitionExample_2.h>
-#include <GLTransitionExample_3.h>
-#include <GLTransitionExample_4.h>
-#include <ConveyorBeltExample.h>
-#include <RGB2NV21Sample.h>
-#include <RGB2I420Sample.h>
-#include <RGB2I444Sample.h>
-#include <CopyTextureExample.h>
-#include <BlitFrameBufferExample.h>
-#include <BinaryProgramExample.h>
+
 #include <koshiSlenderSample.h>
 #include <BigBreast.h>
 #include "MyGLRenderContext.h"
 #include "LogUtil.h"
+#include "BigEyesSample.h"
+#include "FaceSlenderSample.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
 MyGLRenderContext::MyGLRenderContext()
 {
-	m_pCurSample = new BigHeadSample();
+	m_pCurSample = new BigEyesSample();
 	m_pBeforeSample = nullptr;
 }
 
@@ -90,28 +39,65 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
 	if (paramType == SAMPLE_TYPE)
 	{
 		m_pBeforeSample = m_pCurSample;
-
+		int buhinSize = 0 ;
 		LOGCATE("MyGLRenderContext::SetParamsInt 0 m_pBeforeSample = %p", m_pBeforeSample);
 		switch (value0)
 		{
             case SAMPLE_TYPE_KEY_BIG_EYES:
                 m_pCurSample = new BigEyesSample();
+				buhinSize = 8 * 3 ; // 1,2,3,4,5,6,7,8
                 break;
 			case SAMPLE_TYPE_KEY_shrink_koshi:
 				m_pCurSample = new koshiSlenderSample();
+				buhinSize = 4 *3 ;// shouder 11,12 ; // koshi 23, 24
 				break;
 			case SAMPLE_TYPE_KEY_BIG_BREAST:
 				m_pCurSample = new BigBreast() ;
+				buhinSize = 4 * 3  ; //shouder 11,12 ; // koshi 23, 24
 				break ;
 			case SAMPLE_TYPE_KEY_FACE_SLENDER:
 				m_pCurSample = new FaceSlenderSample();
+				buhinSize = 6 *3 ;
 				break;
 			default:
 			    m_pCurSample = nullptr;
 				break;
 		}
+//		if(m_pCurSample){
+//			m_pCurSample ->setBuhinData(karadaData[0] , buhinSize) ;
+//		}
 	}
 }
+
+void MyGLRenderContext::setKaradaData(float *kData,int index,  int length) {
+    for(int i = 0 ; i < length ;i ++){
+        karadaData[index][i] = kData[i] ;
+    }
+}
+
+
+void MyGLRenderContext::setFaceData(float *fData,int index,  int length) {
+    for(int i = 0 ; i < length ;i ++){
+        faceData[index][i] = fData[i] ;
+    }
+}
+
+
+
+void MyGLRenderContext::getKaradaData(float* kData , int index , int type){
+	switch (type) {
+		case 0 :  //koshi
+			kData[0 * 3] = karadaData[index][12 *3 ] ;
+			kData[0 * 3 + 1 ] = karadaData[index][12 *3 + 1 ] ;
+//			kData[1 * 3 ] = karadaData[] ;
+//			kData[0] = karadaData[] ;
+//			kData[0] = karadaData[] ;
+//			kData[0] = karadaData[] ;
+//			kData[0] = karadaData[] ;
+			break ;
+	}
+}
+
 
 void MyGLRenderContext::SetParamsFloat(int paramType, float value0, float value1) {
 	LOGCATE("MyGLRenderContext::SetParamsFloat paramType=%d, value0=%f, value1=%f", paramType, value0, value1);

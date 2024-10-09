@@ -56,14 +56,14 @@ find_library( # Sets the name of the path variable.
               # you want CMake to locate.
               log )
 
-add_library(assimp SHARED IMPORTED )
-set_target_properties(assimp PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libassimp.so)
+#add_library(assimp SHARED IMPORTED )
+#set_target_properties(assimp PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libassimp.so)
 
-add_library(opencv_java3 SHARED IMPORTED )
-set_target_properties(opencv_java3 PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libopencv_java3.so)
+#add_library(opencv_java3 SHARED IMPORTED )
+#set_target_properties(opencv_java3 PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libopencv_java3.so)
 
-add_library(freetype STATIC IMPORTED )
-set_target_properties(freetype PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libfreetype.a)
+#add_library(freetype STATIC IMPORTED )
+#set_target_properties(freetype PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libfreetype.a)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
@@ -74,14 +74,15 @@ set_target_properties(freetype PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID
 #set_target_properties(native-render PROPERTIES LINK_FLAGS -fsanitize=address)
 
 #SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fno-rtti -fno-exceptions")
-set(third-party-libs
-        freetype
-        assimp
-        opencv_java3)
+set(third-party-libs)
+#        assimp
+#freetype
+
+#        opencv_java3)
 
 target_link_libraries( # Specifies the target library.
                        native-render
-
+                        -Wl,--exclude-libs,ALL
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib}
@@ -91,3 +92,8 @@ target_link_libraries( # Specifies the target library.
                        android
                        )
 
+add_compile_options(-Wl,--no-warn)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+set(CMAKE_VERBOSE_MAKEFILE ON)

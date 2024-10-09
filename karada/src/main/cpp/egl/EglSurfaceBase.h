@@ -1,6 +1,3 @@
-//
-// Created by Administrator on 2018/3/21.
-//
 
 #ifndef EGL_HELPER_EGLSURFACEBASE_H
 #define EGL_HELPER_EGLSURFACEBASE_H

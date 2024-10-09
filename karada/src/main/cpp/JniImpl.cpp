@@ -1,6 +1,4 @@
-//
-// Created by karada on 2019/7/9.
-//
+
 #include "util/LogUtil.h"
 #include <MyGLRenderContext.h>
 #include <EGLRender.h>
@@ -34,11 +32,7 @@ JNIEXPORT void JNICALL native_UnInit(JNIEnv *env, jobject instance)
 	MyGLRenderContext::DestroyInstance();
 }
 
-/*
- * Class:     com_byteflow_app_MyNativeRender
- * Method:    native_SetImageData
- * Signature: (III[B)V
- */
+
 JNIEXPORT void JNICALL native_SetImageData
 (JNIEnv *env, jobject instance, jint format, jint width, jint height, jbyteArray imageData)
 {
@@ -89,21 +83,7 @@ JNIEXPORT void JNICALL native_SetParamsFloat
 }
 
 
-/*
- * Class:     com_byteflow_app_MyNativeRender
- * Method:    native_SetAudioData
- * Signature: ([B)V
- */
-JNIEXPORT void JNICALL native_SetAudioData
-		(JNIEnv *env, jobject instance, jshortArray data)
-{
-    int len = env->GetArrayLength(data);
-    short *pShortBuf = new short[len];
-    env->GetShortArrayRegion(data, 0, len, reinterpret_cast<jshort*>(pShortBuf));
-	MyGLRenderContext::GetInstance()->SetParamsShortArr(pShortBuf, len);
-    delete[] pShortBuf;
-    env->DeleteLocalRef(data);
-}
+
 
 /*
  * Class:     com_byteflow_app_MyNativeRender
@@ -142,6 +122,7 @@ JNIEXPORT void JNICALL native_OnSurfaceChanged
  * Method:    native_OnDrawFrame
  * Signature: ()V
  */
+
 JNIEXPORT void JNICALL native_OnDrawFrame(JNIEnv *env, jobject instance)
 {
 	MyGLRenderContext::GetInstance()->OnDrawFrame();
@@ -212,18 +193,51 @@ JNIEXPORT void JNICALL natuve_BgRenderUnInit(JNIEnv *env, jobject instance)
 }
 #endif
 
+
+#include <iostream>
+//JNIEXPORT void JNICALL native_Init(JNIEnv *env, jobject instance)
+extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1SetMarkData(
+        JNIEnv *env, jobject obj ,
+        jobjectArray maskData,
+        jobjectArray faceData)
+{
+	jsize rows = env->GetArrayLength(maskData);
+
+	for (jsize i = 0; i < rows; i++) {
+		jobject row = env->GetObjectArrayElement(maskData, i);
+		jfloatArray floatArray = static_cast<jfloatArray>(row);
+		jsize cols = env->GetArrayLength(floatArray);
+		jfloat *elements = env->GetFloatArrayElements(floatArray, 0);
+		MyGLRenderContext::GetInstance()->setKaradaData(elements , i ,cols) ;
+
+		env->ReleaseFloatArrayElements(floatArray, elements, 0);
+	}
+
+    rows = env->GetArrayLength(faceData) ;
+	for (jsize i = 0; i < rows; i++) {
+		jobject row = env->GetObjectArrayElement(faceData, i);
+		jfloatArray floatArray = static_cast<jfloatArray>(row);
+		jsize cols = env->GetArrayLength(floatArray);
+		jfloat *elements = env->GetFloatArrayElements(floatArray, 0);
+		MyGLRenderContext::GetInstance()->setFaceData(elements , i ,cols) ;
+
+		env->ReleaseFloatArrayElements(floatArray, elements, 0);
+	}
+}
+
 static JNINativeMethod g_RenderMethods[] = {
 		{"native_Init",                      "()V",       (void *)(native_Init)},
+//		{"native_SetMarkData",              "()V",       (void *)(native_SetMarkData)},
 		{"native_UnInit",                    "()V",       (void *)(native_UnInit)},
 		{"native_SetImageData",              "(III[B)V",  (void *)(native_SetImageData)},
 		{"native_SetImageDataWithIndex",     "(IIII[B)V", (void *)(native_SetImageDataWithIndex)},
 		{"native_SetParamsInt",              "(III)V",    (void *)(native_SetParamsInt)},
 		{"native_SetParamsFloat",            "(IFF)V",    (void *)(native_SetParamsFloat)},
-		{"native_SetAudioData",              "([S)V",     (void *)(native_SetAudioData)},
 		{"native_UpdateTransformMatrix",     "(FFFF)V",   (void *)(native_UpdateTransformMatrix)},
 		{"native_OnSurfaceCreated",          "()V",       (void *)(native_OnSurfaceCreated)},
 		{"native_OnSurfaceChanged",          "(II)V",     (void *)(native_OnSurfaceChanged)},
 		{"native_OnDrawFrame",               "()V",       (void *)(native_OnDrawFrame)},
+
 };
 
 static JNINativeMethod g_BgRenderMethods[] = {
@@ -308,3 +322,5 @@ extern "C" void JNI_OnUnload(JavaVM *jvm, void *p)
 
 	UnregisterNativeMethods(env, NATIVE_BG_RENDER_CLASS_NAME);
 }
+
+

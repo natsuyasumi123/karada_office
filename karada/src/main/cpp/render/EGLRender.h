@@ -1,6 +1,3 @@
-//
-// Created by karada on 2019/7/17.
-//
 
 #ifndef NDK_OPENGLES_3_0_BGRENDER_H
 #define NDK_OPENGLES_3_0_BGRENDER_H
@@ -27,6 +24,8 @@ public:
     //void CreateProgramWithFeedback(const char *vShaderStr, const char *fShaderStr);
 
     void SetImageData(uint8_t *pData, int width, int height);
+
+
 
     void SetIntParams(int paramType, int param);
 
@@ -69,6 +68,8 @@ private:
 	GLuint m_ProgramObj;
 	GLuint m_VertexShader;
 	GLuint m_FragmentShader;
+
+
 
 	EGLConfig  m_eglConf;
 	EGLSurface m_eglSurface;

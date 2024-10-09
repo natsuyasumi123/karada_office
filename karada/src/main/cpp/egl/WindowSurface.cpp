@@ -1,6 +1,3 @@
-//
-// Created by Administrator on 2018/3/21.
-//
 
 #include <assert.h>
 #include <LogUtil.h>

@@ -1,6 +1,3 @@
-//
-// Created by karada on 2020/3/10.
-//
 
 #ifndef NDK_OPENGLES_3_0_COMMONDEF_H
 #define NDK_OPENGLES_3_0_COMMONDEF_H

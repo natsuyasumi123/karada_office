@@ -1,6 +1,3 @@
-//
-// Created by byte_flow on 2020/3/10.
-//
 
 #ifndef NDK_OPENGLES_3_0_BYTEFLOWLOCK_H
 #define NDK_OPENGLES_3_0_BYTEFLOWLOCK_H

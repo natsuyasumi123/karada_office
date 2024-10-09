@@ -1,10 +1,4 @@
-/**
- *
- * Created by 公众号：字节流动 on 2021/3/12.
- * https://github.com/githubhaohao/NDK_OpenGLES_3_0
- * 最新文章首发于公众号：字节流动，有疑问或者技术交流可以添加微信 Byte-Flow ,领取视频教程, 拉你进技术交流群
- *
- * */
+
 
 package com.karada.app;
 
@@ -39,6 +33,8 @@ import android.widget.Toast;
 
 import com.enjoy.karada.MyGLRender;
 import com.enjoy.karada.MyGLSurfaceView;
+import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarker;
+import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult;
 import com.karada.app.adapter.MyRecyclerViewAdapter;
 import com.google.mediapipe.framework.image.BitmapImageBuilder;
 import com.google.mediapipe.framework.image.MPImage;
@@ -82,17 +78,24 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
     private static final String[] SAMPLE_TITLES = {
             "腰KOSHI SHRINK" ,
             "胸MUNE BURST ",
-            "👀ME ADJUST",
+            "👀ME ADJUST(unfinished)",
             "☺KAO SLENDER"
     };
 
     private MyGLSurfaceView mGLSurfaceView;
     private ViewGroup mRootView;
     private int mSampleSelectedIndex = SAMPLE_TYPE_KEY_SHRINK_KOSHI - SAMPLE_TYPE;
-
     private MyGLRender mGLRender = new MyGLRender();
     private SensorManager mSensorManager;
     private PoseLandmarker landmarker ;
+    private FaceLandmarker facemarker ;
+
+    //default test file path
+    private String defaultPath = "/sdcard/test/" ;
+    private String showFilePath = "" ;
+
+
+//
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,22 +106,60 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mGLRender.init();
         createLandMarker();
+        createFaceMarker() ;
     }
 
-    float minPoseDetectionConfidence = 0.5f;
-    float minPoseTrackingConfidence = 0.5f;
-    float minPosePresenceConfidence = 0.5f;
-    RunningMode runningMode  = RunningMode.IMAGE;
+
+    @Override
+    public void onGlobalLayout() {
+        mRootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+        mGLSurfaceView = new MyGLSurfaceView(this, mGLRender);
+        mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
+        mRootView.addView(mGLSurfaceView, lp);
+
+        CommonUtils.copyAssetsDirToSDCard(this,"image" ,defaultPath   ) ;
+        showFilePath = defaultPath + "image/test.PNG" ;
+        showImage(  showFilePath) ;
+    }
+
+    interface DetectCallback{
+        void onFinish(float[][] landMarks , float [][] faceMarks);
+    }
 
 
-    private void showDefaultImage(){
+    private void showImage(  String imagePath ){
+        InputStream fis;
+        try {
+            fis = new FileInputStream(imagePath) ;
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        detectImage(imagePath  , (landmarks , facemarks)-> {
+            Bitmap bitmap = loadRGBAImage(fis);
 
-        int resId = R.drawable.test ;
-        InputStream fis = this.getResources().openRawResource(resId) ;
-        Bitmap bitmap = loadRGBAImage(fis);
-        mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
+            runOnUiThread(() -> {
+                if (bitmap != null) {
+                    mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
+                    mGLRender.setMarksData(landmarks , facemarks);//设置人体信息数据
+                    mGLRender.setParamsInt(SAMPLE_TYPE, mSampleSelectedIndex + SAMPLE_TYPE, 0);
+                    int bytes = bitmap.getByteCount();
+                    ByteBuffer buf = ByteBuffer.allocate(bytes);
+                    bitmap.copyPixelsToBuffer(buf);
+                    byte[] byteArray = buf.array();
+                    mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);//设置图片
+                }
+            });
+        });
+
     }
     private void createLandMarker(){
+        float minPoseDetectionConfidence = 0.5f;
+        float minPoseTrackingConfidence = 0.5f;
+        float minPosePresenceConfidence = 0.5f;
+        RunningMode runningMode  = RunningMode.IMAGE;
         BaseOptions.Builder baseOptionBuilder = BaseOptions.builder() ;
         baseOptionBuilder.setDelegate(Delegate.CPU) ;
         baseOptionBuilder.setModelAssetPath("mediapipe_models/pose_landmarker_full.task");
@@ -132,19 +173,30 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                         .setRunningMode(runningMode) ;
         PoseLandmarker.PoseLandmarkerOptions options = optionsBuilder.build() ;
         landmarker = PoseLandmarker.createFromOptions(this ,options ) ;
-
-
-
     }
 
+    private void createFaceMarker(){
+        BaseOptions.Builder baseOptionsBuilder = BaseOptions.builder().setModelAssetPath("mediapipe_models/face_landmarker.task") ;
+        BaseOptions baseOptions = baseOptionsBuilder.build() ;
+
+        FaceLandmarker.FaceLandmarkerOptions.Builder optionsBuilder =
+                FaceLandmarker.FaceLandmarkerOptions.builder()
+                        .setBaseOptions(baseOptionsBuilder.build())
+                        .setMinFaceDetectionConfidence(0.5f)
+                        .setMinTrackingConfidence(0.5f)
+                        .setMinFacePresenceConfidence(0.5f)
+                        .setNumFaces(1)
+                        .setRunningMode(RunningMode.IMAGE) ;
+
+        FaceLandmarker.FaceLandmarkerOptions options = optionsBuilder.build() ;
+        facemarker = FaceLandmarker.createFromOptions(this, options) ;
+    }
 
     public static void saveToTxt(float [ ]retArray , String fileName) {
         // 定义一个float数组
         //float[] retArray = {1.0f, 2.5f, 3.8f, 4.2f, 5.9f};
-
         // 定义文件路径
         String filePath = "/sdcard/" + fileName;
-
         // 使用 try-with-resources 来自动关闭流
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             // 遍历数组并写入文件
@@ -158,90 +210,50 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         }
     }
 
-    private void detectImage(String imagePath){
-
+    private void detectImage(String imagePath , DetectCallback callback){
         Bitmap rawBitmap = BitmapFactory.decodeFile(imagePath) ;
         BitmapImageBuilder imageBuilder = new BitmapImageBuilder(rawBitmap) ;
         MPImage mpImage = imageBuilder.build();
-        long frameTime = SystemClock.uptimeMillis() ;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //landmarker.detectAsync(mpImage , frameTime);
-                PoseLandmarkerResult result= landmarker.detect(mpImage) ;
-                List<List<NormalizedLandmark>> landMarks = result.landmarks() ;
-                Optional<List<MPImage>> segMasks =  result.segmentationMasks() ;
-                List<List<Landmark>> worldMarks =  result.worldLandmarks() ;
-                //Landmark marks[] = (Landmark[]) worldMarks.get(0).toArray();
-                float[] retArray = new float[1000];
+        new Thread(() -> {
+            PoseLandmarkerResult poseRet= landmarker.detect(mpImage) ;
+            List<List<NormalizedLandmark>> landMarks = poseRet.landmarks() ;
+            float [][] poseArray = CommonUtils.convertListToArray(landMarks) ;
+            FaceLandmarkerResult faceRet = facemarker.detect(mpImage) ;
+            List<List<NormalizedLandmark>> faceMarks = faceRet.faceLandmarks();
+            float [][] faceArray = CommonUtils.convertListToArray(faceMarks) ;
+            float[ ] retArray =new float[2000] ;
+            if(faceMarks != null ) {
                 int index = 0 ;
-                if(landMarks != null ){
-                    for(int landIndex = 0 ; landIndex < landMarks.size() ; landIndex ++ ){
-                        for(NormalizedLandmark landmark1 : landMarks.get(landIndex)){
-                            retArray[index ++ ] = landmark1.x() ;
-                            retArray[index ++ ] = landmark1.y() ;
-                            retArray[index ++ ] = landmark1.z() ;
-                        }
-                        saveToTxt(retArray,  "landMark" + landIndex + ".txt");
+                for (int landIndex = 0; landIndex < faceMarks.size(); landIndex++) {
+                    for (NormalizedLandmark landmark1 : faceMarks.get(landIndex)) {
+                        retArray[index++] = landmark1.x();
+                        retArray[index++] = landmark1.y();
+                        retArray[index++] = landmark1.z();
                     }
-
+                    saveToTxt(retArray, "face" + landIndex + ".txt");
                 }
-
-
-                if(segMasks != null  && segMasks.isPresent()){
-                    List<MPImage> segMaskList = segMasks.get();
-                    if(segMaskList != null){
-                        for(MPImage mpImage : segMaskList){
-                            List<MPImageProperties> imageProperties = mpImage.getContainedImageProperties() ;
-                            for(MPImageProperties imageProperty : imageProperties){
-                                imageProperty.getImageFormat() ;
-
-                            }
-                        }
-                    }
-                }
-
-                if(worldMarks != null){
-                    int fileIndex = 0 ;
-                    for(List<Landmark> subMarks  : worldMarks){
-                        float[] markArray = new float[1000];
-                        int i =  0 ;
-                        for(Landmark mark : subMarks){
-                            if(mark != null){
-                                float x=  mark.x() ;
-                                float y = mark.y() ;
-                                float z = mark.z() ;
-                                markArray[i ++ ] = x ;
-                                markArray[i ++ ] = y ;
-                                markArray[i ++ ] = z ;
-                            }
-                        }
-                        saveToTxt(markArray,  "worldMarks" + fileIndex + ".txt");
-                        fileIndex ++ ;
-                    }
-                }
-
-
-
-                Log.e("MainActivity" , "event end " + retArray);
             }
+            callback.onFinish(poseArray , faceArray);
         }).start();
-
     }
 
-    @Override
-    public void onGlobalLayout() {
-        mRootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-        mGLSurfaceView = new MyGLSurfaceView(this, mGLRender);
-        mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
-        mRootView.addView(mGLSurfaceView, lp);
-
-        showDefaultImage();
-    }
-
+    /**
+     * //                Optional<List<MPImage>> segMasks =  result.segmentationMasks() ;
+     * //                List<List<Landmark>> worldMarks =  result.worldLandmarks() ;
+     *             //Landmark marks[] = (Landmark[]) worldMarks.get(0).toArray();
+     * //                float[] retArray = new float[1000];
+     * //                int index = 0 ;
+     * //                if(landMarks != null ){
+     * //                    for(int landIndex = 0 ; landIndex < landMarks.size() ; landIndex ++ ){
+     * //                        for(NormalizedLandmark landmark1 : landMarks.get(landIndex)){
+     * //                            retArray[index ++ ] = landmark1.x() ;
+     * //                            retArray[index ++ ] = landmark1.y() ;
+     * //                            retArray[index ++ ] = landmark1.z() ;
+     * //                        }
+     * //                        saveToTxt(retArray,  "landMark" + landIndex + ".txt");
+     * //                    }
+     * //                }
+     */
 
     /**
      *
@@ -269,11 +281,8 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         if (requestCode == PICK_MEDIA_REQUEST && resultCode == RESULT_OK) {
             if (data != null) {
                 Uri uri = data.getData(); // 获取选中的文件的URI
-                userSelectedPath =  getRealPathFromURI( uri ) ;
-                Log.i("OnActivityResult" , "get file :" + userSelectedPath) ;
-
-
-
+                showFilePath =  getRealPathFromURI( uri ) ;
+                showImage( showFilePath);
             }
         }
     }
@@ -335,7 +344,6 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
     }
 
 
-    private String userSelectedPath = "/sdcard/Materials/e.jpg" ;
 
     private void selectImage(){
 
@@ -389,22 +397,12 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                 || mRootView.getHeight() != mGLSurfaceView.getHeight()) {
             mGLSurfaceView.setAspectRatio(mRootView.getWidth(), mRootView.getHeight());
         }
-        showDefaultImage();
-        mGLRender.setParamsInt(SAMPLE_TYPE, position + SAMPLE_TYPE, 0);
-        mGLSurfaceView.requestRender();
+        showImage(showFilePath);
     }
 
     private Bitmap loadRGBAImage(InputStream is) {
         Bitmap bitmap;
-        try {
-            bitmap = BitmapFactory.decodeStream(is);
-            if (bitmap != null) {
-                int bytes = bitmap.getByteCount();
-                ByteBuffer buf = ByteBuffer.allocate(bytes);
-                bitmap.copyPixelsToBuffer(buf);
-                byte[] byteArray = buf.array();
-                mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);
-            }}
+        try {bitmap = BitmapFactory.decodeStream(is);}
         finally {try {is.close();} catch(IOException e) {e.printStackTrace();}}
         return bitmap;
     }

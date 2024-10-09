@@ -1,10 +1,4 @@
-/**
- *
- * Created by 公众号：字节流动 on 2021/3/12.
- * https://github.com/githubhaohao/NDK_OpenGLES_3_0
- * 最新文章首发于公众号：字节流动，有疑问或者技术交流可以添加微信 Byte-Flow ,领取视频教程, 拉你进技术交流群
- *
- * */
+
 
 package com.enjoy.karada;
 
@@ -12,13 +6,13 @@ public class MyNativeRender {
     public static final int SAMPLE_TYPE  =  200;
 
     public static final int SAMPLE_TYPE_KEY_SHRINK_KOSHI      = SAMPLE_TYPE + 0;
-    public static final int SAMPLE_TYPE_KEY_BIG_BREAST      = SAMPLE_TYPE + 1;
-    public static final int SAMPLE_TYPE_KEY_BIG_EYES            = SAMPLE_TYPE + 2;
-    public static final int SAMPLE_TYPE_KEY_FACE_SLENDER        = SAMPLE_TYPE + 3;
-
-
-    public static final int SAMPLE_TYPE_SET_TOUCH_LOC           = SAMPLE_TYPE + 999;
-    public static final int SAMPLE_TYPE_SET_GRAVITY_XY          = SAMPLE_TYPE + 1000;
+//    public static final int SAMPLE_TYPE_KEY_BIG_BREAST      = SAMPLE_TYPE + 1;
+//    public static final int SAMPLE_TYPE_KEY_BIG_EYES            = SAMPLE_TYPE + 2;
+//    public static final int SAMPLE_TYPE_KEY_FACE_SLENDER        = SAMPLE_TYPE + 3;
+//
+//
+//    public static final int SAMPLE_TYPE_SET_TOUCH_LOC           = SAMPLE_TYPE + 999;
+//    public static final int SAMPLE_TYPE_SET_GRAVITY_XY          = SAMPLE_TYPE + 1000;
 
 
     static {
@@ -39,11 +33,12 @@ public class MyNativeRender {
 
     public native void native_SetImageDataWithIndex(int index, int format, int width, int height, byte[] bytes);
 
-    public native void native_SetAudioData(short[] audioData);
 
     public native void native_OnSurfaceCreated();
 
     public native void native_OnSurfaceChanged(int width, int height);
 
     public native void native_OnDrawFrame();
+
+    public native void native_SetMarkData(float[][] landData , float[][] faceData);
 }

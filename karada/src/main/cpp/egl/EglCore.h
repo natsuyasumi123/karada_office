@@ -1,6 +1,3 @@
-//
-// Created by Administrator on 2018/2/10.
-//
 
 #ifndef EGL_HELPER_EGLCORE_H
 #define EGL_HELPER_EGLCORE_H
