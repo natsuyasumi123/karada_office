@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                         .setMinPosePresenceConfidence(minPosePresenceConfidence)
                         .setRunningMode(runningMode) ;
         PoseLandmarker.PoseLandmarkerOptions options = optionsBuilder.build() ;
-        landmarker = PoseLandmarker.createFromOptions(this ,options ) ;
+        landmarker = PoseLandmarker.createFromOptions(getApplicationContext() ,options ) ;
     }
 
     private void createFaceMarker(){
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                         .setRunningMode(RunningMode.IMAGE) ;
 
         FaceLandmarker.FaceLandmarkerOptions options = optionsBuilder.build() ;
-        facemarker = FaceLandmarker.createFromOptions(this, options) ;
+        facemarker = FaceLandmarker.createFromOptions(getApplicationContext(), options) ;
     }
 
     public static void saveToTxt(float [ ]retArray , String fileName) {

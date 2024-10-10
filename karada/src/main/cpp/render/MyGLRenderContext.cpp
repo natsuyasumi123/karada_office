@@ -110,9 +110,9 @@ std::vector<float> MyGLRenderContext::getKaradaData(int index , int type){
         case 1 :
         {
             kData[0 * 3 ] = (karadaData[index][12 *3 ] * 0.75 +  karadaData[index][11 *3 ] * 0.25) * imageWidth;
-            kData[0 *3 + 1] = (karadaData[index][12 *3 + 1  ]* 0.67 * karadaData[index][24 *3 + 1 ] * 0.33) * imageHeight;
+            kData[0 *3 + 1] = (karadaData[index][12 *3 + 1  ]* 0.67 + karadaData[index][24 *3 + 1 ] * 0.33) * imageHeight;
             kData[1 * 3 ] = (karadaData[index][11 *3 ] * 0.75 + karadaData[index][12 * 3 ] * 0.25 ) * imageWidth;
-            kData[1 *3 + 1] = (karadaData[index][11 *3 + 1  ]* 0.67 * karadaData[index][23 *3 + 1 ] * 0.33) * imageHeight;
+            kData[1 *3 + 1] = (karadaData[index][11 *3 + 1  ]* 0.67 + karadaData[index][23 *3 + 1 ] * 0.33) * imageHeight;
         }
         break ;
         case 2 :{
