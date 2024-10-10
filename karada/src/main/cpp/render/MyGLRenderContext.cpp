@@ -84,18 +84,42 @@ void MyGLRenderContext::setFaceData(float *fData,int index,  int length) {
 
 
 
-void MyGLRenderContext::getKaradaData(float* kData , int index , int type){
+std::vector<float> MyGLRenderContext::getKaradaData(int index , int type){
+    std::vector<float> kData(5 * 3 ) ;
 	switch (type) {
 		case 0 :  //koshi
-			kData[0 * 3] = karadaData[index][12 *3 ] ;
-			kData[0 * 3 + 1 ] = karadaData[index][12 *3 + 1 ] ;
-//			kData[1 * 3 ] = karadaData[] ;
-//			kData[0] = karadaData[] ;
-//			kData[0] = karadaData[] ;
-//			kData[0] = karadaData[] ;
-//			kData[0] = karadaData[] ;
-			break ;
+        {
+            float koshiPosition = 0.7f ;
+            kData[0 * 3] = karadaData[index][12 *3 ]  *imageWidth;
+            kData[0 * 3 + 1 ] = karadaData[index][12 *3 + 1 ] * imageHeight;
+
+            kData[1 * 3] = (karadaData[index][23 *3 ] /2 + karadaData[index][24 *3 ] /2) * imageWidth ;
+            kData[1 * 3 + 1 ] = (karadaData[index][23 *3 + 1 ] /2 + karadaData[index][24 *3 + 1 ] /2)* imageHeight;
+
+            kData[2 * 3] = karadaData[index][11 *3 ] * imageWidth ;
+            kData[2 * 3 + 1 ] = karadaData[index][11 *3 + 1 ] * imageHeight ;
+
+            kData[3 *3 ] = (karadaData[index][24 *3 ] * koshiPosition + karadaData[index][12 * 3]* (1.0f - koshiPosition)) * imageWidth;
+            kData[3 *3 + 1] = (karadaData[index][24 *3 +1 ] * koshiPosition + karadaData[index][12 * 3 +1 ] *(1.0f - koshiPosition)) * imageHeight ;
+
+            kData[4 *3 ] = (karadaData[index][23 *3 ] * koshiPosition + karadaData[index][11 * 3]* (1.0f - koshiPosition)) * imageWidth;
+            kData[4 *3 + 1] = (karadaData[index][23 *3 +1 ] * koshiPosition + karadaData[index][11 * 3 +1 ] *(1.0f - koshiPosition)) * imageHeight ;
+        }
+        break ;
+
+        case 1 :
+        {
+            kData[0 * 3 ] = (karadaData[index][12 *3 ] * 0.75 +  karadaData[index][11 *3 ] * 0.25) * imageWidth;
+            kData[0 *3 + 1] = (karadaData[index][12 *3 + 1  ]* 0.67 * karadaData[index][24 *3 + 1 ] * 0.33) * imageHeight;
+            kData[1 * 3 ] = (karadaData[index][11 *3 ] * 0.75 + karadaData[index][12 * 3 ] * 0.25 ) * imageWidth;
+            kData[1 *3 + 1] = (karadaData[index][11 *3 + 1  ]* 0.67 * karadaData[index][23 *3 + 1 ] * 0.33) * imageHeight;
+        }
+        break ;
+        case 2 :{
+            break ;
+        }
 	}
+    return kData;
 }
 
 
@@ -146,6 +170,9 @@ void MyGLRenderContext::SetImageDataWithIndex(int index, int format, int width, 
 	nativeImage.height = height;
 	nativeImage.ppPlane[0] = pData;
 
+    imageWidth = width ;
+    imageHeight = height ;
+
 	switch (format)
 	{
 		case IMAGE_FORMAT_NV12:
@@ -176,7 +203,9 @@ void MyGLRenderContext::SetImageData(int format, int width, int height, uint8_t 
 	nativeImage.height = height;
 	nativeImage.ppPlane[0] = pData;
 
-	switch (format)
+    imageWidth = width ;
+    imageHeight = height ;
+    switch (format)
 	{
 		case IMAGE_FORMAT_NV12:
 		case IMAGE_FORMAT_NV21:

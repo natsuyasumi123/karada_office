@@ -3,6 +3,7 @@
 #ifndef NDK_OPENGLES_3_0_MYGLRENDERCONTEXT_H
 #define NDK_OPENGLES_3_0_MYGLRENDERCONTEXT_H
 
+#include "vector"
 #include "stdint.h"
 #include <GLES3/gl3.h>
 #include "GLSampleBase.h"
@@ -35,8 +36,8 @@ public:
     void setKaradaData(float *kData ,int index ,  int length) ;
     void setFaceData(float *kData ,int index ,  int length) ;
 
-	void getKaradaData(float * data , int index, int type) ;
-	void getFaceData(float * data , int index, int type) ;
+	std::vector<float> getKaradaData(int index, int type) ;
+    std::vector<float> getFaceData(int index, int type) ;
 
 	static MyGLRenderContext* GetInstance();
 	static void DestroyInstance();
@@ -47,6 +48,8 @@ private:
 	GLSampleBase *m_pCurSample;
 	int m_ScreenW;
 	int m_ScreenH;
+    int imageWidth;
+    int imageHeight;
     GLfloat karadaData[10][33 * 3 ] = {};
     GLfloat faceData[10][33 * 3 ] = {};
 };

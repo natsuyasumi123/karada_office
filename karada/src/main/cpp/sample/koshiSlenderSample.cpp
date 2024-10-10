@@ -6,54 +6,25 @@
 #include "CommonDef.h"
 #include "MyGLRenderContext.h"
 
-
-float karada_data [75] = {
-        328.507,188.281,0.892449,303.478,376.13,0.711954,
-        165.762,388.688,0.567716,65.6257,428.757,0.744823,
-        128.08,253.397,0.780997,448.659,361.136,0.691428,
-        488.866,626.521,0.451658,506.282,814.359,0.671578,
-        280.946,856.934,0.252068,185.818,851.959,0.233529,
-        0,0,0,0,0,0,
-        388.611,864.402,0.22777,0,0,0,
-        0,0,0,283.516,155.762,0.862234,
-        333.648,150.707,0.918626,205.877,203.338,0.840428,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0,0,0,0,
-        0,0,0
-};
-//float LeftCheekKeyPoint11[] = {211, 363};//左脸颊关键点
-//float ChinKeyPoint11[] = {336, 565};//下巴关键点
-//float RightCheekPoint11[] = {471, 365};//右脸颊关键点
-//float LeftSlenderCtlPoint11[] = {211, 512};//左侧控制点
-//float RightSlenderCtlPoint11[] = {477, 509};//右侧控制点
-float koshiPosition = 0.7f ;
-
-
-
-float LeftCheekKeyPoint11[] = {karada_data[6 ], karada_data[7]};//左肩膀
-float ChinKeyPoint11[] = {karada_data[24 ], karada_data[25 ] };//下巴关键点
-float RightCheekPoint11[] = {karada_data[15], karada_data[16]};//右脸颊关键点
-float LeftSlenderCtlPoint11[] = {karada_data[27 ] * koshiPosition + karada_data[6] *(1.0f - koshiPosition) - 20,
-                                 karada_data[28] *koshiPosition + karada_data[7] * (1.0f - koshiPosition)};//左侧控制点
-float RightSlenderCtlPoint11[] = {karada_data[36]  * koshiPosition + karada_data[15 ] * (1.0f - koshiPosition) + 20 ,
-                                  karada_data[37]  * koshiPosition + karada_data[16 ] * (1.0f - koshiPosition)};//右侧控制点
+float LeftCheekKeyPoint11[] = {};
+float ChinKeyPoint11[] = {};
+float RightCheekPoint11[] = {};
+float LeftSlenderCtlPoint11[] = {};
+float RightSlenderCtlPoint11[] = {};
 
 void koshiSlenderSample::initKoshiData() {
-    float koshiData[7 * 3 ]= {} ;
-    MyGLRenderContext::GetInstance()->getKaradaData(koshiData ,0 , 0  );
-    LeftCheekKeyPoint11[0] = koshiData[0 *3 ]  ;
+    std::vector<float > koshiData = MyGLRenderContext::GetInstance()->getKaradaData(0 , 0  );
+    LeftCheekKeyPoint11[0] = koshiData[0 *3 ]   ;
     LeftCheekKeyPoint11[1] = koshiData[ 0* 3 + 1];
-    ChinKeyPoint11[0] = koshiData[1 *3 ]  ;
+    ChinKeyPoint11[0] = koshiData[1 *3 ]   ;
     ChinKeyPoint11[1] = koshiData[ 1* 3 + 1];
     RightCheekPoint11[0] = koshiData[2 *3 ]  ;
     RightCheekPoint11[1] = koshiData[ 2* 3 + 1];
-    LeftSlenderCtlPoint11[0] = koshiData[3 *3 ] * koshiPosition + koshiData[4 * 3] * (1.0f - koshiPosition) ;
-    LeftSlenderCtlPoint11[1] = koshiData[3 *3 + 1  ] * koshiPosition + koshiData[4 * 3 + 1] * (1.0f - koshiPosition) ;
-    RightSlenderCtlPoint11[0] = koshiData[5 *3 ] * koshiPosition + koshiData[6 * 3] * (1.0f - koshiPosition) ;
-    RightSlenderCtlPoint11[1] =koshiData[5 *3 + 1  ] * koshiPosition + koshiData[6 * 3 + 1] * (1.0f - koshiPosition) ;
+    LeftSlenderCtlPoint11[0] = koshiData[3 *3 ]  ;
+    LeftSlenderCtlPoint11[1] = koshiData[3 *3 + 1];
+    RightSlenderCtlPoint11[0] = koshiData[4 *3 ] ;
+    RightSlenderCtlPoint11[1] =koshiData[4 *3 + 1 ] ;
 }
-
 
 koshiSlenderSample::koshiSlenderSample()
 {

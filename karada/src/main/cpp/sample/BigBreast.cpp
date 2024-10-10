@@ -4,33 +4,13 @@
 #include "BigBreast.h"
 #include "../util/GLUtils.h"
 
+#include "MyGLRenderContext.h"
 
 
-float karada_data22 [75] = {
-		328.507,188.281,0.892449,303.478,376.13,0.711954,
-		165.762,388.688,0.567716,65.6257,428.757,0.744823,
-		128.08,253.397,0.780997,448.659,361.136,0.691428,
-		488.866,626.521,0.451658,506.282,814.359,0.671578,
-		280.946,856.934,0.252068,185.818,851.959,0.233529,
-		0,0,0,0,0,0,
-		388.611,864.402,0.22777,0,0,0,
-		0,0,0,283.516,155.762,0.862234,
-		333.648,150.707,0.918626,205.877,203.338,0.840428,
-		0,0,0,0,0,0,
-		0,0,0,0,0,0,
-		0,0,0,0,0,0,
-		0,0,0
-};
-//左右眼的坐标和半径
-//float LeftEyePoint[] = {283, 361};
-//float RightEyePoint[] = {395, 360};
-//float EyeRadius = 36;
-
-
-
-float brestLeftPoint[] = {karada_data22[6]/2 + karada_data22[3] /2, karada_data22[7] * 0.667f + karada_data22[28] *0.333f};
-float rightBreastPoint[] = {karada_data22[15]/2 + karada_data22[3] /2, karada_data22[16] * 0.667f + karada_data22[37] *0.333f};
-
+//float brestLeftPoint[] = {karada_data22[6]/2 + karada_data22[3] /2, karada_data22[7] * 0.667f + karada_data22[28] *0.333f};
+//float rightBreastPoint[] = {karada_data22[15]/2 + karada_data22[3] /2, karada_data22[16] * 0.667f + karada_data22[37] *0.333f};
+float brestLeftPoint[2] = {} ;
+float rightBreastPoint[2] = {};
 int breastSize = 200 ;
 
 BigBreast::BigBreast()
@@ -57,11 +37,19 @@ BigBreast::~BigBreast()
 
 }
 
+void BigBreast::initMuneData() {
+    std::vector<float > muneData = MyGLRenderContext::GetInstance()->getKaradaData(0 , 1 );
+    brestLeftPoint[0] = muneData[0 *3 ] ;
+    brestLeftPoint[1] = muneData[0 *3 + 1] ;
+    rightBreastPoint[0] = muneData[1 *3 ] ;
+    rightBreastPoint[1] = muneData[1 *3  +1] ;
+}
+
 void BigBreast::Init()
 {
 	if(m_ProgramObj)
 		return;
-
+    initMuneData();
 	char vShaderStr[] =
             "#version 300 es\n"
             "layout(location = 0) in vec4 a_position;\n"

@@ -26,6 +26,8 @@ public:
 
 	void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio);
 
+    void initMuneData() ;
+
 private:
 	GLuint m_TextureId;
 	GLint m_SamplerLoc;

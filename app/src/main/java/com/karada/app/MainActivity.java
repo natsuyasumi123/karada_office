@@ -221,18 +221,18 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
             FaceLandmarkerResult faceRet = facemarker.detect(mpImage) ;
             List<List<NormalizedLandmark>> faceMarks = faceRet.faceLandmarks();
             float [][] faceArray = CommonUtils.convertListToArray(faceMarks) ;
-            float[ ] retArray =new float[2000] ;
-            if(faceMarks != null ) {
-                int index = 0 ;
-                for (int landIndex = 0; landIndex < faceMarks.size(); landIndex++) {
-                    for (NormalizedLandmark landmark1 : faceMarks.get(landIndex)) {
-                        retArray[index++] = landmark1.x();
-                        retArray[index++] = landmark1.y();
-                        retArray[index++] = landmark1.z();
-                    }
-                    saveToTxt(retArray, "face" + landIndex + ".txt");
-                }
-            }
+//            float[ ] retArray =new float[2000] ;
+//            if(faceMarks != null ) {
+//                int index = 0 ;
+//                for (int landIndex = 0; landIndex < faceMarks.size(); landIndex++) {
+//                    for (NormalizedLandmark landmark1 : faceMarks.get(landIndex)) {
+//                        retArray[index++] = landmark1.x();
+//                        retArray[index++] = landmark1.y();
+//                        retArray[index++] = landmark1.z();
+//                    }
+//                    saveToTxt(retArray, "face" + landIndex + ".txt");
+//                }
+//            }
             callback.onFinish(poseArray , faceArray);
         }).start();
     }
@@ -358,30 +358,22 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = LayoutInflater.from(this);
         final View rootView = inflater.inflate(R.layout.sample_selected_layout, null);
-
         final AlertDialog dialog = builder.create();
-
         Button confirmBtn = rootView.findViewById(R.id.confirm_btn);
         confirmBtn.setOnClickListener(v -> dialog.cancel());
-
         final RecyclerView resolutionsListView = rootView.findViewById(R.id.resolution_list_view);
-
         final MyRecyclerViewAdapter myPreviewSizeViewAdapter = new MyRecyclerViewAdapter(this, Arrays.asList(SAMPLE_TITLES));
         myPreviewSizeViewAdapter.setSelectIndex(mSampleSelectedIndex);
         myPreviewSizeViewAdapter.addOnItemClickListener((view, position) -> {
             onFuncItemSelected(position);
             dialog.cancel();
         });
-
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setOrientation(LinearLayoutManager.VERTICAL);
         resolutionsListView.setLayoutManager(manager);
-
         resolutionsListView.setAdapter(myPreviewSizeViewAdapter);
-
         dialog.show();
         dialog.getWindow().setContentView(rootView);
-
     }
 
     private void onFuncItemSelected(int position ){
