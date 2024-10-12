@@ -209,7 +209,6 @@ extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1S
 		jsize cols = env->GetArrayLength(floatArray);
 		jfloat *elements = env->GetFloatArrayElements(floatArray, 0);
 		MyGLRenderContext::GetInstance()->setKaradaData(elements , i ,cols * 3 ) ;
-
 		env->ReleaseFloatArrayElements(floatArray, elements, 0);
 	}
 
@@ -223,6 +222,20 @@ extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1S
 
 		env->ReleaseFloatArrayElements(floatArray, elements, 0);
 	}
+}
+
+
+extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1SetOutlineData(
+        JNIEnv *env, jobject obj ,
+        jbyteArray imageData,jint format, jint width, jint height)
+{
+
+    int len = env->GetArrayLength (imageData);
+    uint8_t* buf = new uint8_t[len];
+    env->GetByteArrayRegion(imageData, 0, len, reinterpret_cast<jbyte*>(buf));
+    MyGLRenderContext::GetInstance()->SetOutlineData(format, width, height, buf);
+    delete[] buf;
+    env->DeleteLocalRef(imageData);
 }
 
 static JNINativeMethod g_RenderMethods[] = {

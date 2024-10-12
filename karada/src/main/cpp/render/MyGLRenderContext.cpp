@@ -1,17 +1,17 @@
 
 
-#include <koshiSlenderSample.h>
-#include <BigBreast.h>
+#include <koshiSlim.h>
+#include <MuneBurst.h>
 #include "MyGLRenderContext.h"
 #include "LogUtil.h"
-#include "BigEyesSample.h"
-#include "FaceSlenderSample.h"
+#include "MimiZoom.h"
+#include "kaoSlender.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
 MyGLRenderContext::MyGLRenderContext()
 {
-	m_pCurSample = new BigEyesSample();
+	m_pCurSample = new MimiZoom();
 	m_pBeforeSample = nullptr;
 }
 
@@ -44,19 +44,19 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
 		switch (value0)
 		{
             case SAMPLE_TYPE_KEY_BIG_EYES:
-                m_pCurSample = new BigEyesSample();
+                m_pCurSample = new MimiZoom();
 				buhinSize = 8 * 3 ; // 1,2,3,4,5,6,7,8
                 break;
 			case SAMPLE_TYPE_KEY_shrink_koshi:
-				m_pCurSample = new koshiSlenderSample();
+				m_pCurSample = new koshiSlim();
 				buhinSize = 4 *3 ;// shouder 11,12 ; // koshi 23, 24
 				break;
 			case SAMPLE_TYPE_KEY_BIG_BREAST:
-				m_pCurSample = new BigBreast() ;
+				m_pCurSample = new MuneBurst() ;
 				buhinSize = 4 * 3  ; //shouder 11,12 ; // koshi 23, 24
 				break ;
 			case SAMPLE_TYPE_KEY_FACE_SLENDER:
-				m_pCurSample = new FaceSlenderSample();
+				m_pCurSample = new kaoSlender();
 				buhinSize = 6 *3 ;
 				break;
 			default:
@@ -89,7 +89,7 @@ std::vector<float> MyGLRenderContext::getKaradaData(int index , int type){
 	switch (type) {
 		case 0 :  //koshi
         {
-            float koshiPosition = 0.7f ;
+            float koshiPosition = 0.5f ;
             kData[0 * 3] = karadaData[index][12 *3 ]  *imageWidth;
             kData[0 * 3 + 1 ] = karadaData[index][12 *3 + 1 ] * imageHeight;
 
@@ -223,6 +223,35 @@ void MyGLRenderContext::SetImageData(int format, int width, int height, uint8_t 
 	{
 		m_pCurSample->LoadImage(&nativeImage);
 	}
+
+}
+
+void MyGLRenderContext::SetOutlineData(int format, int width, int height, uint8_t *pData)
+{
+    NativeImage nativeImage;
+    nativeImage.format = format;
+    nativeImage.width = width;
+    nativeImage.height = height;
+    nativeImage.ppPlane[0] = pData;
+
+    switch (format)
+    {
+        case IMAGE_FORMAT_NV12:
+        case IMAGE_FORMAT_NV21:
+            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            break;
+        case IMAGE_FORMAT_I420:
+            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            nativeImage.ppPlane[2] = nativeImage.ppPlane[1] + width * height / 4;
+            break;
+        default:
+            break;
+    }
+
+//    if (m_pCurSample)
+//    {
+//        m_pCurSample->LoadImage(&nativeImage);
+//    }
 
 }
 

@@ -16,6 +16,7 @@ public class MyGLSurfaceView extends GLSurfaceView  {
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
 
     public static final int IMAGE_FORMAT_RGBA = 0x01;
+    public static final int IMAGE_FORMAT_GRAY = 0x06;
 
 
     private MyGLRender mGLRender;

@@ -10,7 +10,7 @@ set(jnilibs "${CMAKE_SOURCE_DIR}/../jniLibs")
 include_directories(
         util
         render
-        sample
+        applications
         glm
         inc
         inc/assimp
@@ -30,7 +30,7 @@ file(GLOB src-files
         ${CMAKE_SOURCE_DIR}/*.cpp
         ${CMAKE_SOURCE_DIR}/render/*.cpp
         ${CMAKE_SOURCE_DIR}/util/*.cpp
-        ${CMAKE_SOURCE_DIR}/sample/*.cpp
+        ${CMAKE_SOURCE_DIR}/applications/*.cpp
         ${CMAKE_SOURCE_DIR}/egl/*.cpp
         ${CMAKE_SOURCE_DIR}/looper/*.cpp)
 

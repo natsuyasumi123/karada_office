@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.hardware.SensorManager;
 import androidx.annotation.*;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,13 +34,15 @@ import android.widget.Toast;
 
 import com.enjoy.karada.MyGLRender;
 import com.enjoy.karada.MyGLSurfaceView;
+import com.google.mediapipe.framework.image.ByteBufferExtractor;
+import com.google.mediapipe.tasks.components.containers.Landmark;
 import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarker;
 import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult;
+import com.google.mediapipe.tasks.vision.imagesegmenter.ImageSegmenter;
+import com.google.mediapipe.tasks.vision.imagesegmenter.ImageSegmenterResult;
 import com.karada.app.adapter.MyRecyclerViewAdapter;
 import com.google.mediapipe.framework.image.BitmapImageBuilder;
 import com.google.mediapipe.framework.image.MPImage;
-import com.google.mediapipe.framework.image.MPImageProperties;
-import com.google.mediapipe.tasks.components.containers.Landmark;
 import com.google.mediapipe.tasks.components.containers.NormalizedLandmark;
 import com.google.mediapipe.tasks.core.BaseOptions;
 import com.google.mediapipe.tasks.core.Delegate;
@@ -53,6 +56,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +70,7 @@ import java.io.FileWriter;
 import static android.opengl.GLSurfaceView.RENDERMODE_CONTINUOUSLY;
 import static com.enjoy.karada.MyGLSurfaceView.* ;
 import static com.enjoy.karada.MyNativeRender.*;
+import static com.karada.app.CommonUtils.saveBitmapToFile;
 
 public class MainActivity extends AppCompatActivity implements ViewTreeObserver.OnGlobalLayoutListener {
     private static final String TAG = "MainActivity";
@@ -90,6 +96,8 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
     private PoseLandmarker landmarker ;
     private FaceLandmarker facemarker ;
 
+    private ImageSegmenter imagesegmenter ;
+
     //default test file path
     private String defaultPath = "/sdcard/test/" ;
     private String showFilePath = "" ;
@@ -107,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         mGLRender.init();
         createLandMarker();
         createFaceMarker() ;
+        createImageSegmenter();
     }
 
 
@@ -126,34 +135,43 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
     }
 
     interface DetectCallback{
-        void onFinish(float[][] landMarks , float [][] faceMarks);
+        void onFinish(float[][] landMarks , float [][] faceMarks , Bitmap bitmap , int width , int height);
     }
 
 
     private void showImage(  String imagePath ){
-        InputStream fis;
-        try {
-            fis = new FileInputStream(imagePath) ;
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        detectImage(imagePath  , (landmarks , facemarks)-> {
-            Bitmap bitmap = loadRGBAImage(fis);
 
-            runOnUiThread(() -> {
-                if (bitmap != null) {
-                    mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
-                    mGLRender.setMarksData(landmarks , facemarks);//设置人体信息数据
-                    mGLRender.setParamsInt(SAMPLE_TYPE, mSampleSelectedIndex + SAMPLE_TYPE, 0);
-                    int bytes = bitmap.getByteCount();
-                    ByteBuffer buf = ByteBuffer.allocate(bytes);
-                    bitmap.copyPixelsToBuffer(buf);
-                    byte[] byteArray = buf.array();
-                    mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);//设置图片
+        detectImage(imagePath, new DetectCallback() {
+            @Override
+            public void onFinish(float[][] landMarks, float[][] faceMarks , Bitmap mask , int width , int height) {
+                InputStream fis;
+                try {
+                    fis = new FileInputStream(imagePath) ;
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-            });
+                Bitmap bitmap = loadRGBAImage(fis);
+                runOnUiThread(() -> {
+                    if (bitmap != null) {
+                        mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
+                        mGLRender.setMarksData(landMarks , faceMarks);//设置人体信息数据
+                        mGLRender.setParamsInt(SAMPLE_TYPE, mSampleSelectedIndex + SAMPLE_TYPE, 0);
+                        int bytes = bitmap.getByteCount();
+                        ByteBuffer buf = ByteBuffer.allocate(bytes);
+                        bitmap.copyPixelsToBuffer(buf);
+                        byte[] byteArray = buf.array();
+                        mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);//设置图片
+                    }
+                    if (mask != null) {
+                        int bytes = mask.getByteCount();
+                        ByteBuffer buf = ByteBuffer.allocate(bytes);
+                        mask.copyPixelsToBuffer(buf);
+                        byte[] byteArray = buf.array();
+                        mGLRender.setOutlineData(byteArray , IMAGE_FORMAT_GRAY, mask.getWidth(), mask.getHeight() );//设置图片
+                    }
+                });
+            }
         });
-
     }
     private void createLandMarker(){
         float minPoseDetectionConfidence = 0.5f;
@@ -175,9 +193,54 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         landmarker = PoseLandmarker.createFromOptions(getApplicationContext() ,options ) ;
     }
 
+    private void createImageSegmenter(){
+        BaseOptions.Builder baseOptionsBuilder = BaseOptions.builder();
+//        when (currentDelegate) {
+//            DELEGATE_CPU -> {
+                baseOptionsBuilder.setDelegate(Delegate.CPU);
+//            }
+//            DELEGATE_GPU -> {
+//                baseOptionsBuilder.setDelegate(Delegate.GPU)
+//            }
+//        }
+
+//        when(currentModel) {
+//            MODEL_DEEPLABV3 -> {
+                baseOptionsBuilder.setModelAssetPath("mediapipe_models/segmenters/selfie_multiclass.tflite");
+//            }
+//            MODEL_HAIR_SEGMENTER -> {
+//                baseOptionsBuilder.setModelAssetPath(MODEL_HAIR_SEGMENTER_PATH)
+//            }
+//            MODEL_SELFIE_SEGMENTER -> {
+//                baseOptionsBuilder.setModelAssetPath(MODEL_SELFIE_SEGMENTER_PATH)
+//            }
+//            MODEL_SELFIE_MULTICLASS -> {
+//                baseOptionsBuilder.setModelAssetPath(MODEL_SELFIE_MULTICLASS_PATH)
+//            }
+//        }
+        RunningMode runningMode  = RunningMode.IMAGE;
+        BaseOptions baseOptions = baseOptionsBuilder.build();
+        ImageSegmenter.ImageSegmenterOptions.Builder optionsBuilder = ImageSegmenter.ImageSegmenterOptions.builder()
+                .setRunningMode(runningMode)
+                .setBaseOptions(baseOptions)
+                .setOutputCategoryMask(true)
+                .setOutputConfidenceMasks(false) ;
+
+//        if (runningMode == RunningMode.LIVE_STREAM) {
+//            optionsBuilder.setResultListener((result, input) -> {
+//
+//            }).setErrorListener(e -> {
+//
+//            });
+//        }
+
+        ImageSegmenter.ImageSegmenterOptions options = optionsBuilder.build() ;
+        imagesegmenter = ImageSegmenter.createFromOptions(getApplicationContext(), options) ;
+    }
+
     private void createFaceMarker(){
         BaseOptions.Builder baseOptionsBuilder = BaseOptions.builder().setModelAssetPath("mediapipe_models/face_landmarker.task") ;
-        BaseOptions baseOptions = baseOptionsBuilder.build() ;
+//        BaseOptions baseOptions = baseOptionsBuilder.build() ;
 
         FaceLandmarker.FaceLandmarkerOptions.Builder optionsBuilder =
                 FaceLandmarker.FaceLandmarkerOptions.builder()
@@ -217,25 +280,78 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         new Thread(() -> {
             PoseLandmarkerResult poseRet= landmarker.detect(mpImage) ;
             List<List<NormalizedLandmark>> landMarks = poseRet.landmarks() ;
+            Optional<List<MPImage>>segMasksOpt =  poseRet.segmentationMasks() ;
+            if(segMasksOpt.isPresent()){
+                List<MPImage> segMasks = segMasksOpt.get() ;
+                for(MPImage segMask : segMasks){
+                    int width = segMask.getWidth();
+                    int height = segMask.getHeight() ;
+                }
+            }
+            List<List<Landmark>> worldmarks = poseRet.worldLandmarks() ;
             float [][] poseArray = CommonUtils.convertListToArray(landMarks) ;
             FaceLandmarkerResult faceRet = facemarker.detect(mpImage) ;
             List<List<NormalizedLandmark>> faceMarks = faceRet.faceLandmarks();
             float [][] faceArray = CommonUtils.convertListToArray(faceMarks) ;
-//            float[ ] retArray =new float[2000] ;
-//            if(faceMarks != null ) {
-//                int index = 0 ;
-//                for (int landIndex = 0; landIndex < faceMarks.size(); landIndex++) {
-//                    for (NormalizedLandmark landmark1 : faceMarks.get(landIndex)) {
-//                        retArray[index++] = landmark1.x();
-//                        retArray[index++] = landmark1.y();
-//                        retArray[index++] = landmark1.z();
-//                    }
-//                    saveToTxt(retArray, "face" + landIndex + ".txt");
-//                }
-//            }
-            callback.onFinish(poseArray , faceArray);
+
+
+            ImageSegmenterResult result = imagesegmenter.segment(mpImage) ;
+            Optional<MPImage> cateMaskOpt = result.categoryMask();
+            Optional<List<MPImage>>confidenceMasksOpt = result.confidenceMasks() ;
+            List<Float>scores = result.qualityScores();
+
+            if(confidenceMasksOpt.isPresent()){
+                List<MPImage> masks = confidenceMasksOpt.get();
+                int index = 0 ;
+                for(MPImage maskImage : masks){
+                    FloatBuffer results =  ByteBufferExtractor.extract(maskImage).asFloatBuffer() ;
+                    Bitmap bitmapResult = createBitmapFromBuffer(results , maskImage.getWidth() , maskImage.getHeight() , true) ;
+                    saveBitmapToFile(bitmapResult , "savedImage" +index+ ".jpg") ;
+                    index ++ ;
+                    Log.w("MainActivity" , "bitmapResult is " + bitmapResult.getByteCount()) ;
+                }
+            }
+            Bitmap maskBitmap = null ;
+            int width = 0, height = 0 ;
+            if(cateMaskOpt.isPresent()){
+                MPImage cateMask = cateMaskOpt.get() ;
+                ByteBuffer results =  ByteBufferExtractor.extract(cateMask);
+                width = cateMask.getWidth() ;
+                height = cateMask.getHeight() ;
+                maskBitmap = CommonUtils.createBitmapFromByteBuffer(results , width ,height) ;
+//                saveBitmapToFile(bitmapResult , "cateMask.jpg") ;
+            }
+
+            callback.onFinish(poseArray , faceArray , maskBitmap,width , height );
         }).start();
     }
+
+    private Bitmap createBitmapFromBuffer(FloatBuffer floatBuffer,
+                                          int width,
+                                          int height , boolean isFloat ){
+        width = width / 3 ;
+        height = height /3 ;
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        // 创建一个int数组来存储像素数据
+        int[] pixels = new int[width * height];
+        for (int i = 0; i < width * height; i++) {
+            // 假设FloatBuffer中的每个像素由4个浮点数表示：R, G, B, A
+            float r = floatBuffer.get();
+            float g = floatBuffer.get();
+            float b = floatBuffer.get();
+            float a = floatBuffer.get(); // 透明度
+            // 将浮点值 (0 - 1) 转换为 0 - 255 的int值
+            int red = Math.round(r * 255);
+            int green = Math.round(g * 255);
+            int blue = Math.round(b * 255);
+            int alpha = Math.round(a * 255);
+            // 使用Color.argb()函数生成ARGB颜色值
+            pixels[i] = (alpha & 0xff) << 24 | (red & 0xff) << 16 | (green & 0xff) << 8 | (blue & 0xff);
+        }
+        bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+        return bitmap ;
+    }
+
 
     /**
      * //                Optional<List<MPImage>> segMasks =  result.segmentationMasks() ;

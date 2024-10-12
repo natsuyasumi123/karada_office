@@ -8,7 +8,13 @@ import com.google.mediapipe.tasks.components.containers.NormalizedLandmark;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.List;
+import android.graphics.Bitmap;
+import android.os.Environment;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class CommonUtils {
     private static final String TAG = "CommonUtils";
@@ -80,4 +86,54 @@ public class CommonUtils {
 
         return array;
     }
+
+
+    public static Bitmap createBitmapFromByteBuffer(ByteBuffer byteBuffer, int width, int height) {
+        int capacity = byteBuffer.capacity();
+        int wh4= width * height * 4 ;
+//        if (byteBuffer.capacity() < width * height * 4) {
+//            throw new IllegalArgumentException("ByteBuffer does not contain enough data for the specified width and height.");
+//        }
+        // 确保byteBuffer位置在开始位置
+        byteBuffer.rewind();
+        // 创建Bitmap对象
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ALPHA_8);
+
+        // 将ByteBuffer中的像素数据拷贝到Bitmap
+        bitmap.copyPixelsFromBuffer(byteBuffer);
+
+        return bitmap;
+    }
+
+    public static void saveBitmapToFile(Bitmap bitmap, String fileName) {
+        // 确定文件路径，保存到外部存储的图片文件夹
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        // 创建文件对象
+        File imageFile = new File(storageDir, fileName + ".png"); // 可以使用 .jpg 保存为JPEG格式
+
+        FileOutputStream outputStream = null;
+        try {
+            // 创建文件输出流
+            outputStream = new FileOutputStream(imageFile);
+
+            // 将Bitmap压缩并写入文件，参数分别是压缩格式和质量（0-100，100为最高）
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+
+            // 确保数据写入文件
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            // 关闭输出流
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 }

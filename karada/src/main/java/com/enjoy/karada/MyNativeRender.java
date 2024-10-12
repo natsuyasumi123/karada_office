@@ -41,4 +41,5 @@ public class MyNativeRender {
     public native void native_OnDrawFrame();
 
     public native void native_SetMarkData(float[][] landData , float[][] faceData);
+    public native void native_SetOutlineData( byte[] bytes ,int format, int width, int height);
 }

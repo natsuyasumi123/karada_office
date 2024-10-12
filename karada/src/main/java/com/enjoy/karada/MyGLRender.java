@@ -64,5 +64,9 @@ public class MyGLRender implements GLSurfaceView.Renderer {
         mNativeRender.native_SetMarkData(poseData, faceData) ;
     }
 
+    public void setOutlineData(byte[] bytes , int format , int width , int height) {
+        mNativeRender.native_SetOutlineData(bytes , format , width , height) ;
+    }
+
 
 }
