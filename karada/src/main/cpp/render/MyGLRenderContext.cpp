@@ -11,7 +11,7 @@ MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
 MyGLRenderContext::MyGLRenderContext()
 {
-	m_pCurSample = new MimiZoom();
+	m_pCurSample = new koshiSlim();
 	m_pBeforeSample = nullptr;
 }
 
@@ -63,9 +63,6 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
 			    m_pCurSample = nullptr;
 				break;
 		}
-//		if(m_pCurSample){
-//			m_pCurSample ->setBuhinData(karadaData[0] , buhinSize) ;
-//		}
 	}
 }
 
@@ -83,13 +80,19 @@ void MyGLRenderContext::setFaceData(float *fData,int index,  int length) {
 }
 
 
+void MyGLRenderContext::setDegree(float degree){
+    if(m_pCurSample)
+    {
+        m_pCurSample->degree = degree ;
+    }
+}
 
 std::vector<float> MyGLRenderContext::getKaradaData(int index , int type){
     std::vector<float> kData(5 * 3 ) ;
 	switch (type) {
 		case 0 :  //koshi
         {
-            float koshiPosition = 0.5f ;
+            float koshiPosition = 0.7f ;
             kData[0 * 3] = karadaData[index][12 *3 ]  *imageWidth;
             kData[0 * 3 + 1 ] = karadaData[index][12 *3 + 1 ] * imageHeight;
 
@@ -109,10 +112,14 @@ std::vector<float> MyGLRenderContext::getKaradaData(int index , int type){
 
         case 1 :
         {
-            kData[0 * 3 ] = (karadaData[index][12 *3 ] * 0.75 +  karadaData[index][11 *3 ] * 0.25) * imageWidth;
-            kData[0 *3 + 1] = (karadaData[index][12 *3 + 1  ]* 0.67 + karadaData[index][24 *3 + 1 ] * 0.33) * imageHeight;
-            kData[1 * 3 ] = (karadaData[index][11 *3 ] * 0.75 + karadaData[index][12 * 3 ] * 0.25 ) * imageWidth;
-            kData[1 *3 + 1] = (karadaData[index][11 *3 + 1  ]* 0.67 + karadaData[index][23 *3 + 1 ] * 0.33) * imageHeight;
+            kData[0 *3 ] = (karadaData[index][12 *3 ] *0.5+  karadaData[index][11 *3 ] * 0.5) * imageWidth ;
+            kData[0 *3 +1] = ((karadaData[index][12 *3 +1 ] + karadaData[index][11 *3 +1]) *0.33 + (karadaData[index][24 *3+1 ]+karadaData[index][23 * 3 +1 ]) *0.17) * imageHeight ;
+            kData[1 *3 ] =  kData[0 *3];
+            kData[1 *3 +1] =  kData[0 *3 +1];
+//            kData[0 * 3 ] = (karadaData[index][12 *3 ] * 7 /12 +  karadaData[index][24 *3 ] * 5 /12) * imageWidth;
+//            kData[0 *3 + 1] = (karadaData[index][12 *3 + 1  ]*7 /12 + karadaData[index][24 *3 + 1 ] * 5 / 12) * imageHeight;
+//            kData[1 * 3 ] = (karadaData[index][11 *3 ] * 7/12 + karadaData[index][23 * 3 ] * 5/12 ) * imageWidth;
+//            kData[1 *3 + 1] = (karadaData[index][11 *3 + 1  ]* 7/12 + karadaData[index][23 *3 + 1 ] * 5 /12) * imageHeight;
         }
         break ;
         case 2 :{
@@ -307,6 +314,11 @@ void MyGLRenderContext::DestroyInstance()
 		m_pContext = nullptr;
 	}
 
+}
+
+void MyGLRenderContext::getImageSize(int& width , int& height){
+    width = imageWidth ;
+    height = imageHeight ;
 }
 
 

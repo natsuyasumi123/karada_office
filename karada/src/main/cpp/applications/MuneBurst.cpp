@@ -43,6 +43,11 @@ void MuneBurst::initMuneData() {
     brestLeftPoint[1] = muneData[0 *3 + 1] ;
     rightBreastPoint[0] = muneData[1 *3 ] ;
     rightBreastPoint[1] = muneData[1 *3  +1] ;
+    int imageWidth= 0 , imageHeight = 0 ;
+    MyGLRenderContext::GetInstance()->getImageSize(imageWidth , imageHeight) ;
+
+    int muneHorizonDiffer = rightBreastPoint[0] - brestLeftPoint[0] ;
+    breastSize = 400;
 }
 
 void MuneBurst::Init()
@@ -196,7 +201,7 @@ void MuneBurst::Draw(int screenW, int screenH)
 
 	glViewport(0, 0, screenW, screenH);
 
-	m_FrameIndex ++;
+
 	UpdateMVPMatrix(m_MVPMatrix, m_AngleX, m_AngleY, (float)screenW / screenH);
 
 	// Use the program object
@@ -211,9 +216,9 @@ void MuneBurst::Draw(int screenW, int screenH)
 	glBindTexture(GL_TEXTURE_2D, m_TextureId);
 	glUniform1i(m_SamplerLoc, 0);
 
-    float offset = (m_FrameIndex % 100) * 1.0f / 100;
-    offset = (m_FrameIndex / 100) % 2 == 1 ? (1 - offset) : offset;
-
+//    float offset = (m_FrameIndex % 100) * 1.0f / 100;
+//    offset = (m_FrameIndex / 100) % 2 == 1 ? (1 - offset) : offset;
+    float offset = degree ;
 	GLUtils::setFloat(m_ProgramObj, "u_ScaleRatio", offset * 1.3f);
 	GLUtils::setFloat(m_ProgramObj, "u_Radius", breastSize);
 	GLUtils::setVec2(m_ProgramObj, "u_LeftEyeCenterPos", brestLeftPoint[0], brestLeftPoint[1]);

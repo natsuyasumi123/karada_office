@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.enjoy.karada.MyGLRender;
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
 
     private MyGLSurfaceView mGLSurfaceView;
     private ViewGroup mRootView;
+    private SeekBar seekBar ;
     private int mSampleSelectedIndex = SAMPLE_TYPE_KEY_SHRINK_KOSHI - SAMPLE_TYPE;
     private MyGLRender mGLRender = new MyGLRender();
     private SensorManager mSensorManager;
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRootView = findViewById(R.id.rootView);
+        seekBar = findViewById(R.id.seekBar) ;
         mRootView.getViewTreeObserver().addOnGlobalLayoutListener(this);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mGLRender.init();
@@ -130,9 +133,32 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         mRootView.addView(mGLSurfaceView, lp);
 
         CommonUtils.copyAssetsDirToSDCard(this,"image" ,defaultPath   ) ;
-        showFilePath = defaultPath + "image/test.PNG" ;
+        //showFilePath = defaultPath + "image/test.PNG" ;
+        showFilePath = defaultPath + "image/e.jpg" ;
         showImage(  showFilePath) ;
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(fromUser ) {
+                    float degree = (float)progress / seekBar.getMax() ;
+                    mGLRender.setDegree(degree);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
+
+
+
 
     interface DetectCallback{
         void onFinish(float[][] landMarks , float [][] faceMarks , Bitmap bitmap , int width , int height);
@@ -377,18 +403,23 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
      * @return nullable
      */
     public String getRealPathFromURI(Uri uri) {
-        String path = null;
-        if (Build.VERSION.SDK_INT < 11)
-            path = RealPathUtils.getRealPathFromURI_BelowAPI11(MainActivity.this, uri);
-            // SDK >= 11 && SDK < 19
-        else if (Build.VERSION.SDK_INT < 19)
-            path = RealPathUtils.getRealPathFromURI_API11to18(MainActivity.this, uri);
-            // SDK > 19 (Android 4.4)
-        else
-            path = RealPathUtils.getRealPathFromURI_API19(MainActivity.this, uri);
-        Log.d(TAG, "File Path: " + path);
-        // Get the file instance
-        return path;
+        try {
+            String path = null;
+            if (Build.VERSION.SDK_INT < 11)
+                path = RealPathUtils.getRealPathFromURI_BelowAPI11(MainActivity.this, uri);
+                // SDK >= 11 && SDK < 19
+            else if (Build.VERSION.SDK_INT < 19)
+                path = RealPathUtils.getRealPathFromURI_API11to18(MainActivity.this, uri);
+                // SDK > 19 (Android 4.4)
+            else
+                path = RealPathUtils.getRealPathFromURI_API19(MainActivity.this, uri);
+            Log.d(TAG, "File Path: " + path);
+            // Get the file instance
+            return path;
+        }catch (Throwable t ){
+            t.printStackTrace();
+        }
+        return "" ;
     }
 
     @Override

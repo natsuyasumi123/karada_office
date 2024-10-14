@@ -76,6 +76,8 @@ protected:
 	int m_SurfaceHeight;
 	float mbuhinData[33 * 3 ]  = {0.0f};
 	int buhinSize ;
+public :
+    float degree ;
 };
 
 

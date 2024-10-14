@@ -238,6 +238,14 @@ extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1S
     env->DeleteLocalRef(imageData);
 }
 
+extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1SetDegree(
+        JNIEnv *env, jobject obj ,
+        jfloat degree )
+{
+
+    MyGLRenderContext::GetInstance()->setDegree(degree);
+}
+
 static JNINativeMethod g_RenderMethods[] = {
 		{"native_Init",                      "()V",       (void *)(native_Init)},
 //		{"native_SetMarkData",              "()V",       (void *)(native_SetMarkData)},

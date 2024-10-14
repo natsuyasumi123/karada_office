@@ -248,8 +248,9 @@ void koshiSlim::Draw(int screenW, int screenH)
     glBindTexture(GL_TEXTURE_2D, m_TextureId);
     glUniform1i(m_SamplerLoc, 0);
 
-    float ratio = (m_FrameIndex % 100) * 1.0f / 100;
-    ratio = (m_FrameIndex / 100) % 2 == 1 ? (1 - ratio) : ratio;
+//    float ratio = (m_FrameIndex % 100) * 1.0f / 100;
+//    ratio = (m_FrameIndex / 100) % 2 == 1 ? (1 - ratio) : ratio;
+    float ratio = degree ; 
 
     float effectRadius = PointUtil::Distance(PointF(LeftCheekKeyPoint11[0], LeftCheekKeyPoint11[1]), PointF(ChinKeyPoint11[0], ChinKeyPoint11[1])) / 2;
     LOGCATE("koshiSlim::Draw() ratio=%f, effectRadius=%f", ratio, effectRadius);

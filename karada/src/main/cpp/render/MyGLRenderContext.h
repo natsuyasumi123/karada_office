@@ -40,8 +40,12 @@ public:
 	std::vector<float> getKaradaData(int index, int type) ;
     std::vector<float> getFaceData(int index, int type) ;
 
+    void setDegree(float degree) ;
+
 	static MyGLRenderContext* GetInstance();
 	static void DestroyInstance();
+
+    void getImageSize(int & width , int & height) ;
 
 private:
 	static MyGLRenderContext *m_pContext;

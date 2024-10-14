@@ -5,7 +5,7 @@ import static com.enjoy.karada.MyNativeRender.*;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
-import com.google.mediapipe.tasks.components.containers.NormalizedLandmark;
+//import com.google.mediapipe.tasks.components.containers.NormalizedLandmark;
 
 import java.util.List;
 
@@ -65,8 +65,20 @@ public class MyGLRender implements GLSurfaceView.Renderer {
     }
 
     public void setOutlineData(byte[] bytes , int format , int width , int height) {
-        mNativeRender.native_SetOutlineData(bytes , format , width , height) ;
+       // mNativeRender.native_SetOutlineData(bytes , format , width , height) ;
     }
 
+    /**
+     * 用户手动设置一些部位的大小和位置
+     * @param type 人体部位类型
+     * @param poseData 相关的数据  簡単のために、いちこデータ渡ってがいい
+     * @param degree
+     */
+    public void setCustomPosition(int type , float [][] poseData ,  float degree){
 
+    }
+
+    public void setDegree(float degree){
+        mNativeRender.native_SetDegree(degree);
+    }
 }
