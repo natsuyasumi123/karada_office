@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
     //default test file path
     private String defaultPath = "/sdcard/test/" ;
     private String showFilePath = "" ;
+    private Uri selectedUri =null ;
 
 
 //
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         CommonUtils.copyAssetsDirToSDCard(this,"image" ,defaultPath   ) ;
         //showFilePath = defaultPath + "image/test.PNG" ;
         showFilePath = defaultPath + "image/e.jpg" ;
-        showImage(  showFilePath) ;
+        showImage(  showFilePath , selectedUri) ;
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -178,15 +180,8 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         }
     }
     private  ProgressDialog progressDialog= null ;
-    private void showImage(  String imagePath ){
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressDialog = ProgressDialog.show(MainActivity.this , "Loading" , "Loadding data") ;
-            }
-        });
-        detectImage(imagePath, new DetectCallback() {
+    private void showImage(  String imagePath , Uri uri  ){
+        detectImage(imagePath, uri ,new DetectCallback() {
             @Override
             public void onFinish(float[][] landMarks, float[][] faceMarks , Bitmap mask , int width , int height) {
                 if(landMarks == null || faceMarks == null){
@@ -194,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                     return ;
                 }
                 printFloatArray(landMarks );
-//                printFloatArray(faceMarks );
                 InputStream fis;
                 try {
                     fis = new FileInputStream(imagePath) ;
@@ -215,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                         bitmap.copyPixelsToBuffer(buf);
                         byte[] byteArray = buf.array();
                         mGLRender.setParamsInt(SAMPLE_TYPE, mSampleSelectedIndex + SAMPLE_TYPE, 0);
-                        mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray , landMarks);//设置图片
+                        mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray , landMarks , faceMarks);//设置图片
 
 //                        mGLRender.setMarksData(landMarks , null);//设置人体信息数据
 
@@ -334,12 +328,25 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         }
     }
 
-    private void detectImage(String imagePath , DetectCallback callback){
-        Bitmap rawBitmap = BitmapFactory.decodeFile(imagePath) ;
+    private void detectImage(String imagePath , Uri uri , DetectCallback callback){
+        Log.e(TAG , "detected image " + imagePath) ;
+        Bitmap rawBitmap = null ;
+        if(imagePath != null ){
+            rawBitmap = BitmapFactory.decodeFile(imagePath) ;
+        }else if(uri != null ){
+            try {
+                rawBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if(rawBitmap == null){
+            return ;
+        }
+        runOnUiThread(() -> progressDialog = ProgressDialog.show(MainActivity.this , "Loading" , "Loadding data"));
         BitmapImageBuilder imageBuilder = new BitmapImageBuilder(rawBitmap) ;
         MPImage mpImage = imageBuilder.build();
         new Thread(() -> {
-
             PoseLandmarkerResult poseRet= landmarker.detect(mpImage) ;
             List<List<NormalizedLandmark>> landMarks = poseRet.landmarks() ;
             Optional<List<MPImage>>segMasksOpt =  poseRet.segmentationMasks() ;
@@ -465,7 +472,8 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
             if (data != null) {
                 Uri uri = data.getData(); // 获取选中的文件的URI
                 showFilePath =  getRealPathFromURI( uri ) ;
-                showImage( showFilePath);
+                selectedUri = uri;
+                showImage( showFilePath , selectedUri);
             }
         }
     }
@@ -572,7 +580,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                 || mRootView.getHeight() != mGLSurfaceView.getHeight()) {
             mGLSurfaceView.setAspectRatio(mRootView.getWidth(), mRootView.getHeight());
         }
-        showImage(showFilePath);
+        showImage(showFilePath , selectedUri);
     }
 
     private Bitmap loadRGBAImage(InputStream is) {

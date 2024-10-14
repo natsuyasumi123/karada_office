@@ -126,8 +126,26 @@ void MyGLRenderContext::setDegree(float degree){
             kData[1 * 3 ] = (karadaData[index][11 *3 ] * 2.0/3 + karadaData[index][12 * 3 ] * 1.0/3 ) * imageWidth;
             kData[1 *3 + 1] = (karadaData[index][11 *3 + 1]* 8/12 + karadaData[index][23 *3 + 1] * 4 /12) * imageHeight;
         }
+
         break ;
         case 2 :{
+            break ;
+        }
+        case 3 :{
+            kData[0 *3 + 0] = karadaData[index][8 *3 ] * imageWidth ;
+            kData[0 *3 + 1] = karadaData[index] [8 *3  + 1 ] * imageHeight ;
+            kData[1 *3 + 0] =(karadaData[index][9 *3 ] + karadaData[index][10 *3]) /2 * imageWidth ;
+            kData[1 *3 + 1] =((karadaData[index][9 *3 +1] + karadaData[index][10 *3 +1]) - karadaData[index][0*3 +1 ]) * imageHeight ;
+            kData[2*3 +0] =karadaData[index][7 *3 ] * imageWidth ;
+            kData[2*3 +1] =karadaData[index][7 *3 +1] * imageHeight ;
+            kData[3*3 +0] =karadaData[index][10 *3 ] * imageWidth ;
+//            kData[3*3 +1] =karadaData[index][10 *3 +1 ] * imageHeight ;
+            kData[3*3 +1] =(karadaData[index][10 *3 +1 ] + (karadaData[index][10*3 +1] - karadaData[index][8 *3 +1])/3) * imageHeight ;
+            kData[4*3 +0] =karadaData[index][9 *3 ] * imageWidth  ;
+            kData[4*3 +1] =(karadaData[index][9 *3 +1 ] + (karadaData[index][9*3 +1] - karadaData[index][7 *3 +1]) /3) * imageHeight ;
+            float kaoWidth = kData[4 *3] - kData[3*3] ;
+            kData[4 *3 ] += kaoWidth ;
+            kData[3*3] -= kaoWidth;
             break ;
         }
 	}

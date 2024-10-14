@@ -4,7 +4,7 @@
 #include "KAO_Slender.h"
 #include "../util/GLUtils.h"
 #include "CommonDef.h"
-
+#include "MyGLRenderContext.h"
 
 
 float face_data11 [210] = {
@@ -49,7 +49,7 @@ float face_data11 [210] = {
 //float RightCheekPoint[] = {471, 365};//右脸颊关键点
 //float LeftSlenderCtlPoint[] = {211, 512};//左侧控制点
 //float RightSlenderCtlPoint[] = {477, 509};//右侧控制点
- float LeftCheekKeyPoint[] = {face_data11[0], face_data11[1]};//左脸颊关键点
+float LeftCheekKeyPoint[] = {face_data11[0], face_data11[1]};//左脸颊关键点
 float ChinKeyPoint[] = {face_data11[24], face_data11[25]};//下巴关键点
 float RightCheekPoint[] = {face_data11[48], face_data11[49]};//右脸颊关键点
 float LeftSlenderCtlPoint[] = {face_data11[12]- 10, face_data11[13]  };//左侧控制点
@@ -230,7 +230,33 @@ void KAO_Slender::LoadImage(NativeImage *pImage)
 		m_RenderImage.format = pImage->format;
 		NativeImageUtil::CopyNativeImage(pImage, &m_RenderImage);
 	}
+}
 
+void KAO_Slender::initKaoData() {
+    std::vector<float> kaoData(5 * 3 ) ;
+    bool ret = MyGLRenderContext::GetInstance()->getKaradaData(0 , 3 ,kaoData);
+    if(ret){
+
+          LeftCheekKeyPoint[0] = kaoData[0 *3];//左脸颊关键点
+          LeftCheekKeyPoint[1] =  kaoData[0 *3 + 1];//左脸颊关键点
+          ChinKeyPoint[0] = kaoData[1 *3 ];//下巴关键点
+          ChinKeyPoint[1] = kaoData[1 *3 +1];//下巴关键点
+          RightCheekPoint[0] = kaoData[2 *3 ];//右脸颊关键点
+          RightCheekPoint[1] = kaoData[2 *3 +1];//右脸颊关键点
+          LeftSlenderCtlPoint[0] = kaoData[3 *3 ];//左侧控制点
+          LeftSlenderCtlPoint[1] = kaoData[3 *3 +1];//左侧控制点
+          RightSlenderCtlPoint[0] = kaoData[4 *3 ];//右侧控制点
+          RightSlenderCtlPoint[1] = kaoData[4 *3 + 1];//右侧控制点
+//        brestLeftPoint[0] = kaoData[0 *3 ] ;
+//        brestLeftPoint[1] = kaoData[0 *3 + 1] ;
+//        rightBreastPoint[0] = kaoData[1 *3 ] ;
+//        rightBreastPoint[1] = kaoData[1 *3  +1] ;
+//        int imageWidth= 0 , imageHeight = 0 ;
+//        MyGLRenderContext::GetInstance()->getImageSize(imageWidth , imageHeight) ;
+//        int muneHorizonDiffer = rightBreastPoint[0] - brestLeftPoint[0] ;
+//        breastSize = muneHorizonDiffer  ;
+        LOGCATE("MUNE_Burst::Init create program fail");
+    }
 }
 
 void KAO_Slender::Draw(int screenW, int screenH)
@@ -255,26 +281,20 @@ void KAO_Slender::Draw(int screenW, int screenH)
         }
         return;
     }
-
+    initKaoData() ;
 	glViewport(0, 0, screenW, screenH);
 
-	m_FrameIndex ++;
 	UpdateMVPMatrix(m_MVPMatrix, m_AngleX, m_AngleY, (float)screenW / screenH);
-
 	// Use the program object
 	glUseProgram (m_ProgramObj);
-
 	glBindVertexArray(m_VaoId);
-
 	glUniformMatrix4fv(m_MVPMatLoc, 1, GL_FALSE, &m_MVPMatrix[0][0]);
-
 	// Bind the RGBA map
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_TextureId);
 	glUniform1i(m_SamplerLoc, 0);
 
-    float ratio = (m_FrameIndex % 100) * 1.0f / 100;
-    ratio = (m_FrameIndex / 100) % 2 == 1 ? (1 - ratio) : ratio;
+    float ratio = degree ;
 
     float effectRadius = PointUtil::Distance(PointF(LeftCheekKeyPoint[0], LeftCheekKeyPoint[1]), PointF(ChinKeyPoint[0], ChinKeyPoint[1])) / 2;
     LOGCATE("KAO_Slender::Draw() ratio=%f, effectRadius=%f", ratio, effectRadius);

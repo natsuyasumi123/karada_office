@@ -34,7 +34,7 @@ JNIEXPORT void JNICALL native_UnInit(JNIEnv *env, jobject instance)
 
 
 JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1SetImageData
-(JNIEnv *env, jobject instance, jint format, jint width, jint height, jbyteArray imageData , jobjectArray maskData )
+(JNIEnv *env, jobject instance, jint format, jint width, jint height, jbyteArray imageData , jobjectArray maskData, jobjectArray faceData )
 {
 	int len = env->GetArrayLength (imageData);
 	uint8_t* buf = new uint8_t[len];
@@ -52,6 +52,16 @@ JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1SetImageData
         MyGLRenderContext::GetInstance()->setKaradaData(elements , i ,cols * 3 ) ;
         env->ReleaseFloatArrayElements(floatArray, elements, 0);
     }
+
+//    rows = env->GetArrayLength(faceData);
+//    for (jsize i = 0; i < rows; i++) {
+//        jobject row = env->GetObjectArrayElement(faceData, i);
+//        jfloatArray floatArray = static_cast<jfloatArray>(row);
+//        jsize cols = env->GetArrayLength(floatArray);
+//        jfloat *elements = env->GetFloatArrayElements(floatArray, 0);
+//        MyGLRenderContext::GetInstance()->setFaceData(elements , i ,cols * 3 ) ;
+//        env->ReleaseFloatArrayElements(floatArray, elements, 0);
+//    }
 }
 
 /*
