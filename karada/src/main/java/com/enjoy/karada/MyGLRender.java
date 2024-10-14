@@ -56,8 +56,8 @@ public class MyGLRender implements GLSurfaceView.Renderer {
         mNativeRender.native_SetParamsInt(paramType, value0, value1);
     }
 
-    public void setImageData(int format, int width, int height, byte[] bytes) {
-        mNativeRender.native_SetImageData(format, width, height, bytes);
+    public void setImageData(int format, int width, int height, byte[] bytes , float[][] landData) {
+        mNativeRender.native_SetImageData(format, width, height, bytes ,landData );
     }
 
     public void setMarksData(float[][]  poseData , float[][]  faceData){

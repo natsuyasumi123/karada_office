@@ -1,20 +1,20 @@
 
 
-#ifndef NDK_OPENGLES_3_0_BIGEYESSAMPLE_H
-#define NDK_OPENGLES_3_0_BIGEYESSAMPLE_H
+#ifndef NDK_OPENGLES_3_0_koshiSlenderSample_H
+#define NDK_OPENGLES_3_0_koshiSlenderSample_H
 
 
 #include <detail/type_mat.hpp>
 #include <detail/type_mat4x4.hpp>
 #include <ByteFlowLock.h>
-#include "GLSampleBase.h"
+#include "AppBase.h"
 
-class MimiZoom : public GLSampleBase
+class KOSHI_Slim : public AppBase
 {
 public:
-	MimiZoom();
+    KOSHI_Slim();
 
-	virtual ~MimiZoom();
+	virtual ~KOSHI_Slim();
 
 	virtual void LoadImage(NativeImage *pImage);
 
@@ -34,8 +34,9 @@ private:
 	GLuint m_VaoId;
 	GLuint m_VboIds[3];
 	NativeImage m_RenderImage;
+	NativeImage m_OutLineImage;
 	glm::mat4 m_MVPMatrix;
-
+    bool koshiDataChanged = true ;
 	int m_AngleX;
 	int m_AngleY;
 	float m_ScaleX;
@@ -43,7 +44,9 @@ private:
 
 	int m_FrameIndex;
 
+	void initKoshiData();
+
 };
 
 
-#endif //NDK_OPENGLES_3_0_BIGEYESSAMPLE_H
+#endif

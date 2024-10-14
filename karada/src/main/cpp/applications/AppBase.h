@@ -22,10 +22,10 @@
 #define SAMPLE_TYPE_SET_GRAVITY_XY              SAMPLE_TYPE + 1000
 
 #define DEFAULT_OGL_ASSETS_DIR "/sdcard/Android/data/com.karada.app/files/Download"
-class GLSampleBase
+class AppBase
 {
 public:
-	GLSampleBase()
+	AppBase()
 	{
 		m_ProgramObj = 0;
 		m_VertexShader = 0;
@@ -36,7 +36,7 @@ public:
 
 	}
 
-	virtual ~GLSampleBase()
+	virtual ~AppBase()
 	{
 
 	}
@@ -81,7 +81,7 @@ public :
 };
 
 
-//void GLSampleBase::setBuhinData(float *data , int size){
+//void AppBase::setBuhinData(float *data , int size){
 //	for(int index = 0 ; index < size ; index ++ ){
 //		mbuhinData[index] = data[index] ;
 //	}

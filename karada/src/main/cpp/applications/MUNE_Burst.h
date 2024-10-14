@@ -6,14 +6,14 @@
 #include <detail/type_mat.hpp>
 #include <detail/type_mat4x4.hpp>
 #include <ByteFlowLock.h>
-#include "GLSampleBase.h"
+#include "AppBase.h"
 
-class MuneBurst : public GLSampleBase
+class MUNE_Burst : public AppBase
 {
 public:
-	MuneBurst();
+	MUNE_Burst();
 
-	virtual ~MuneBurst();
+	virtual ~MUNE_Burst();
 
 	virtual void LoadImage(NativeImage *pImage);
 
@@ -44,6 +44,7 @@ private:
 
 	int m_FrameIndex;
 
+    bool dataChange = true ;
 };
 
 

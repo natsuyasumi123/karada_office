@@ -33,8 +33,8 @@ JNIEXPORT void JNICALL native_UnInit(JNIEnv *env, jobject instance)
 }
 
 
-JNIEXPORT void JNICALL native_SetImageData
-(JNIEnv *env, jobject instance, jint format, jint width, jint height, jbyteArray imageData)
+JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1SetImageData
+(JNIEnv *env, jobject instance, jint format, jint width, jint height, jbyteArray imageData , jobjectArray maskData )
 {
 	int len = env->GetArrayLength (imageData);
 	uint8_t* buf = new uint8_t[len];
@@ -42,6 +42,16 @@ JNIEXPORT void JNICALL native_SetImageData
 	MyGLRenderContext::GetInstance()->SetImageData(format, width, height, buf);
 	delete[] buf;
 	env->DeleteLocalRef(imageData);
+
+    jsize rows = env->GetArrayLength(maskData);
+    for (jsize i = 0; i < rows; i++) {
+        jobject row = env->GetObjectArrayElement(maskData, i);
+        jfloatArray floatArray = static_cast<jfloatArray>(row);
+        jsize cols = env->GetArrayLength(floatArray);
+        jfloat *elements = env->GetFloatArrayElements(floatArray, 0);
+        MyGLRenderContext::GetInstance()->setKaradaData(elements , i ,cols * 3 ) ;
+        env->ReleaseFloatArrayElements(floatArray, elements, 0);
+    }
 }
 
 /*
@@ -212,16 +222,16 @@ extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1S
 		env->ReleaseFloatArrayElements(floatArray, elements, 0);
 	}
 
-    rows = env->GetArrayLength(faceData) ;
-	for (jsize i = 0; i < rows; i++) {
-		jobject row = env->GetObjectArrayElement(faceData, i);
-		jfloatArray floatArray = static_cast<jfloatArray>(row);
-		jsize cols = env->GetArrayLength(floatArray);
-		jfloat *elements = env->GetFloatArrayElements(floatArray, 0);
-		MyGLRenderContext::GetInstance()->setFaceData(elements , i ,cols * 3 ) ;
-
-		env->ReleaseFloatArrayElements(floatArray, elements, 0);
-	}
+//    rows = env->GetArrayLength(faceData) ;
+//	for (jsize i = 0; i < rows; i++) {
+//		jobject row = env->GetObjectArrayElement(faceData, i);
+//		jfloatArray floatArray = static_cast<jfloatArray>(row);
+//		jsize cols = env->GetArrayLength(floatArray);
+//		jfloat *elements = env->GetFloatArrayElements(floatArray, 0);
+//		MyGLRenderContext::GetInstance()->setFaceData(elements , i ,cols * 3 ) ;
+//
+//		env->ReleaseFloatArrayElements(floatArray, elements, 0);
+//	}
 }
 
 
@@ -250,7 +260,7 @@ static JNINativeMethod g_RenderMethods[] = {
 		{"native_Init",                      "()V",       (void *)(native_Init)},
 //		{"native_SetMarkData",              "()V",       (void *)(native_SetMarkData)},
 		{"native_UnInit",                    "()V",       (void *)(native_UnInit)},
-		{"native_SetImageData",              "(III[B)V",  (void *)(native_SetImageData)},
+//		{"native_SetImageData",              "(III[B[Ljava/lang/Object)V",  (void *)(native_SetImageData)},
 		{"native_SetImageDataWithIndex",     "(IIII[B)V", (void *)(native_SetImageDataWithIndex)},
 		{"native_SetParamsInt",              "(III)V",    (void *)(native_SetParamsInt)},
 		{"native_SetParamsFloat",            "(IFF)V",    (void *)(native_SetParamsFloat)},

@@ -1,7 +1,7 @@
 
 
 #include <gtc/matrix_transform.hpp>
-#include "kaoSlender.h"
+#include "KAO_Slender.h"
 #include "../util/GLUtils.h"
 #include "CommonDef.h"
 
@@ -55,7 +55,7 @@ float RightCheekPoint[] = {face_data11[48], face_data11[49]};//右脸颊关键�
 float LeftSlenderCtlPoint[] = {face_data11[12]- 10, face_data11[13]  };//左侧控制点
 float RightSlenderCtlPoint[] = {face_data11[36] + 10, face_data11[37] };//右侧控制点
 
-kaoSlender::kaoSlender()
+KAO_Slender::KAO_Slender()
 {
 
 	m_SamplerLoc = GL_NONE;
@@ -73,13 +73,13 @@ kaoSlender::kaoSlender()
 	m_FrameIndex = 0;
 }
 
-kaoSlender::~kaoSlender()
+KAO_Slender::~KAO_Slender()
 {
 	NativeImageUtil::FreeNativeImage(&m_RenderImage);
 
 }
 
-void kaoSlender::Init()
+void KAO_Slender::Init()
 {
 	if(m_ProgramObj)
 		return;
@@ -170,7 +170,7 @@ void kaoSlender::Init()
 	}
 	else
 	{
-		LOGCATE("kaoSlender::Init create program fail");
+		LOGCATE("KAO_Slender::Init create program fail");
 	}
 
 	GLfloat verticesCoords[] = {
@@ -219,9 +219,9 @@ void kaoSlender::Init()
 
 }
 
-void kaoSlender::LoadImage(NativeImage *pImage)
+void KAO_Slender::LoadImage(NativeImage *pImage)
 {
-	LOGCATE("kaoSlender::LoadImage pImage = %p", pImage->ppPlane[0]);
+	LOGCATE("KAO_Slender::LoadImage pImage = %p", pImage->ppPlane[0]);
 	if (pImage)
 	{
         ScopedSyncLock lock(&m_Lock);
@@ -233,9 +233,9 @@ void kaoSlender::LoadImage(NativeImage *pImage)
 
 }
 
-void kaoSlender::Draw(int screenW, int screenH)
+void KAO_Slender::Draw(int screenW, int screenH)
 {
-	LOGCATE("kaoSlender::Draw() [w,h]=[%d,%d]", screenW, screenH);
+	LOGCATE("KAO_Slender::Draw() [w,h]=[%d,%d]", screenW, screenH);
 
 	if(m_ProgramObj == GL_NONE) return;
 
@@ -277,7 +277,7 @@ void kaoSlender::Draw(int screenW, int screenH)
     ratio = (m_FrameIndex / 100) % 2 == 1 ? (1 - ratio) : ratio;
 
     float effectRadius = PointUtil::Distance(PointF(LeftCheekKeyPoint[0], LeftCheekKeyPoint[1]), PointF(ChinKeyPoint[0], ChinKeyPoint[1])) / 2;
-    LOGCATE("kaoSlender::Draw() ratio=%f, effectRadius=%f", ratio, effectRadius);
+    LOGCATE("KAO_Slender::Draw() ratio=%f, effectRadius=%f", ratio, effectRadius);
 	GLUtils::setFloat(m_ProgramObj, "u_reshapeRatio", ratio);
 	GLUtils::setFloat(m_ProgramObj, "u_reshapeRadius", effectRadius);
 	GLUtils::setVec4(m_ProgramObj, "u_preCtrlPoints",
@@ -299,7 +299,7 @@ void kaoSlender::Draw(int screenW, int screenH)
 
 }
 
-void kaoSlender::Destroy()
+void KAO_Slender::Destroy()
 {
 	if (m_ProgramObj)
 	{
@@ -316,9 +316,9 @@ void kaoSlender::Destroy()
  * @param angleY 绕Y轴旋转度数
  * @param ratio 宽高比
  * */
-void kaoSlender::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio)
+void KAO_Slender::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio)
 {
-	LOGCATE("kaoSlender::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
+	LOGCATE("KAO_Slender::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
 	angleX = angleX % 360;
 	angleY = angleY % 360;
 
@@ -350,9 +350,9 @@ void kaoSlender::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, f
 
 }
 
-void kaoSlender::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
+void KAO_Slender::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
 {
-	GLSampleBase::UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
+	AppBase::UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
 	m_AngleX = static_cast<int>(rotateX);
 	m_AngleY = static_cast<int>(rotateY);
 	m_ScaleX = scaleX;

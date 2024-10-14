@@ -4,6 +4,7 @@ package com.karada.app;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -29,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -60,6 +62,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -165,11 +168,33 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
     }
 
 
+    private void printFloatArray(float [][] array){
+
+        for (float[] floats : array) {
+//            Log.w("printFloatArray", Collections.singletonList(floats).toString());
+            for (int j = 0; j < floats.length; j++) {
+                Log.w("printFloatArray", "index = " + j + " ; value is " + floats[j]);
+            }
+        }
+    }
+    private  ProgressDialog progressDialog= null ;
     private void showImage(  String imagePath ){
 
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog = ProgressDialog.show(MainActivity.this , "Loading" , "Loadding data") ;
+            }
+        });
         detectImage(imagePath, new DetectCallback() {
             @Override
             public void onFinish(float[][] landMarks, float[][] faceMarks , Bitmap mask , int width , int height) {
+                if(landMarks == null || faceMarks == null){
+                    Log.e(TAG, "result data is null" ) ;
+                    return ;
+                }
+                printFloatArray(landMarks );
+//                printFloatArray(faceMarks );
                 InputStream fis;
                 try {
                     fis = new FileInputStream(imagePath) ;
@@ -178,15 +203,25 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                 }
                 Bitmap bitmap = loadRGBAImage(fis);
                 runOnUiThread(() -> {
+                    if(progressDialog != null && progressDialog.isShowing()){
+                        progressDialog.dismiss();
+                        progressDialog = null ;
+                    }
                     if (bitmap != null) {
                         mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
-                        mGLRender.setMarksData(landMarks , faceMarks);//设置人体信息数据
-                        mGLRender.setParamsInt(SAMPLE_TYPE, mSampleSelectedIndex + SAMPLE_TYPE, 0);
+
                         int bytes = bitmap.getByteCount();
                         ByteBuffer buf = ByteBuffer.allocate(bytes);
                         bitmap.copyPixelsToBuffer(buf);
                         byte[] byteArray = buf.array();
-                        mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);//设置图片
+                        mGLRender.setParamsInt(SAMPLE_TYPE, mSampleSelectedIndex + SAMPLE_TYPE, 0);
+                        mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray , landMarks);//设置图片
+
+//                        mGLRender.setMarksData(landMarks , null);//设置人体信息数据
+
+
+
+//                        mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);//设置图片
                     }
                     if (mask != null) {
                         int bytes = mask.getByteCount();
@@ -304,6 +339,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         BitmapImageBuilder imageBuilder = new BitmapImageBuilder(rawBitmap) ;
         MPImage mpImage = imageBuilder.build();
         new Thread(() -> {
+
             PoseLandmarkerResult poseRet= landmarker.detect(mpImage) ;
             List<List<NormalizedLandmark>> landMarks = poseRet.landmarks() ;
             Optional<List<MPImage>>segMasksOpt =  poseRet.segmentationMasks() ;

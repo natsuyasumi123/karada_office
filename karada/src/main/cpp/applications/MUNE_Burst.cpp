@@ -1,7 +1,7 @@
 
 
 #include <gtc/matrix_transform.hpp>
-#include "MuneBurst.h"
+#include "MUNE_Burst.h"
 #include "../util/GLUtils.h"
 
 #include "MyGLRenderContext.h"
@@ -13,7 +13,7 @@ float brestLeftPoint[2] = {} ;
 float rightBreastPoint[2] = {};
 int breastSize = 200 ;
 
-MuneBurst::MuneBurst()
+MUNE_Burst::MUNE_Burst()
 {
 
 	m_SamplerLoc = GL_NONE;
@@ -31,30 +31,37 @@ MuneBurst::MuneBurst()
 	m_FrameIndex = 0;
 }
 
-MuneBurst::~MuneBurst()
+MUNE_Burst::~MUNE_Burst()
 {
 	NativeImageUtil::FreeNativeImage(&m_RenderImage);
 
 }
 
-void MuneBurst::initMuneData() {
-    std::vector<float > muneData = MyGLRenderContext::GetInstance()->getKaradaData(0 , 1 );
-    brestLeftPoint[0] = muneData[0 *3 ] ;
-    brestLeftPoint[1] = muneData[0 *3 + 1] ;
-    rightBreastPoint[0] = muneData[1 *3 ] ;
-    rightBreastPoint[1] = muneData[1 *3  +1] ;
-    int imageWidth= 0 , imageHeight = 0 ;
-    MyGLRenderContext::GetInstance()->getImageSize(imageWidth , imageHeight) ;
-
-    int muneHorizonDiffer = rightBreastPoint[0] - brestLeftPoint[0] ;
-    breastSize = 400;
+void MUNE_Burst::initMuneData() {
+//    if(!dataChange ){
+//        return ;
+//    }
+//    dataChange = false ;
+    std::vector<float> muneData(5 * 3 ) ;
+    bool ret = MyGLRenderContext::GetInstance()->getKaradaData(0 , 1 ,muneData);
+    if(ret){
+        brestLeftPoint[0] = muneData[0 *3 ] ;
+        brestLeftPoint[1] = muneData[0 *3 + 1] ;
+        rightBreastPoint[0] = muneData[1 *3 ] ;
+        rightBreastPoint[1] = muneData[1 *3  +1] ;
+        int imageWidth= 0 , imageHeight = 0 ;
+        MyGLRenderContext::GetInstance()->getImageSize(imageWidth , imageHeight) ;
+        int muneHorizonDiffer = rightBreastPoint[0] - brestLeftPoint[0] ;
+        breastSize = muneHorizonDiffer  ;
+        LOGCATE("MUNE_Burst::Init create program fail");
+    }
 }
 
-void MuneBurst::Init()
+void MUNE_Burst::Init()
 {
 	if(m_ProgramObj)
 		return;
-    initMuneData();
+
 	char vShaderStr[] =
             "#version 300 es\n"
             "layout(location = 0) in vec4 a_position;\n"
@@ -113,7 +120,7 @@ void MuneBurst::Init()
 	}
 	else
 	{
-		LOGCATE("MuneBurst::Init create program fail");
+		LOGCATE("MUNE_Burst::Init create program fail");
 	}
 
 	GLfloat verticesCoords[] = {
@@ -163,9 +170,9 @@ void MuneBurst::Init()
 
 }
 
-void MuneBurst::LoadImage(NativeImage *pImage)
+void MUNE_Burst::LoadImage(NativeImage *pImage)
 {
-	LOGCATE("MuneBurst::LoadImage pImage = %p", pImage->ppPlane[0]);
+	LOGCATE("MUNE_Burst::LoadImage pImage = %p", pImage->ppPlane[0]);
 	if (pImage)
 	{
 	    ScopedSyncLock lock(&m_Lock);
@@ -176,9 +183,9 @@ void MuneBurst::LoadImage(NativeImage *pImage)
 	}
 }
 
-void MuneBurst::Draw(int screenW, int screenH)
+void MUNE_Burst::Draw(int screenW, int screenH)
 {
-	LOGCATE("MuneBurst::Draw() [w,h]=[%d,%d]", screenW, screenH);
+	LOGCATE("MUNE_Burst::Draw() [w,h]=[%d,%d]", screenW, screenH);
 
 	if(m_ProgramObj == GL_NONE) return;
 
@@ -198,6 +205,7 @@ void MuneBurst::Draw(int screenW, int screenH)
         }
         return;
     }
+    initMuneData() ;
 
 	glViewport(0, 0, screenW, screenH);
 
@@ -229,7 +237,7 @@ void MuneBurst::Draw(int screenW, int screenH)
 
 }
 
-void MuneBurst::Destroy()
+void MUNE_Burst::Destroy()
 {
 	if (m_ProgramObj)
 	{
@@ -246,9 +254,9 @@ void MuneBurst::Destroy()
  * @param angleY 绕Y轴旋转度数
  * @param ratio 宽高比
  * */
-void MuneBurst::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio)
+void MUNE_Burst::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio)
 {
-	LOGCATE("MuneBurst::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
+	LOGCATE("MUNE_Burst::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
 	angleX = angleX % 360;
 	angleY = angleY % 360;
 
@@ -280,9 +288,9 @@ void MuneBurst::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, fl
 
 }
 
-void MuneBurst::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
+void MUNE_Burst::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
 {
-	GLSampleBase::UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
+	AppBase::UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
 	m_AngleX = static_cast<int>(rotateX);
 	m_AngleY = static_cast<int>(rotateY);
 	m_ScaleX = scaleX;

@@ -1,17 +1,17 @@
 
 
-#include <koshiSlim.h>
-#include <MuneBurst.h>
+#include <KOSHI_Slim.h>
+#include <MUNE_Burst.h>
 #include "MyGLRenderContext.h"
 #include "LogUtil.h"
-#include "MimiZoom.h"
-#include "kaoSlender.h"
+#include "MIMI_Zoom.h"
+#include "KAO_Slender.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
 MyGLRenderContext::MyGLRenderContext()
 {
-	m_pCurSample = new koshiSlim();
+	m_pCurSample = new KOSHI_Slim();
 	m_pBeforeSample = nullptr;
 }
 
@@ -44,19 +44,19 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
 		switch (value0)
 		{
             case SAMPLE_TYPE_KEY_BIG_EYES:
-                m_pCurSample = new MimiZoom();
+                m_pCurSample = new MIMI_Zoom();
 				buhinSize = 8 * 3 ; // 1,2,3,4,5,6,7,8
                 break;
 			case SAMPLE_TYPE_KEY_shrink_koshi:
-				m_pCurSample = new koshiSlim();
+				m_pCurSample = new KOSHI_Slim();
 				buhinSize = 4 *3 ;// shouder 11,12 ; // koshi 23, 24
 				break;
 			case SAMPLE_TYPE_KEY_BIG_BREAST:
-				m_pCurSample = new MuneBurst() ;
+				m_pCurSample = new MUNE_Burst() ;
 				buhinSize = 4 * 3  ; //shouder 11,12 ; // koshi 23, 24
 				break ;
 			case SAMPLE_TYPE_KEY_FACE_SLENDER:
-				m_pCurSample = new kaoSlender();
+				m_pCurSample = new KAO_Slender();
 				buhinSize = 6 *3 ;
 				break;
 			default:
@@ -70,6 +70,7 @@ void MyGLRenderContext::setKaradaData(float *kData,int index,  int length) {
     for(int i = 0 ; i < length ;i ++){
         karadaData[index][i] = kData[i] ;
     }
+    dataSet = true ;
 }
 
 
@@ -77,6 +78,7 @@ void MyGLRenderContext::setFaceData(float *fData,int index,  int length) {
     for(int i = 0 ; i < length ;i ++){
         faceData[index][i] = fData[i] ;
     }
+    dataSet = true ;
 }
 
 
@@ -87,8 +89,11 @@ void MyGLRenderContext::setDegree(float degree){
     }
 }
 
-std::vector<float> MyGLRenderContext::getKaradaData(int index , int type){
-    std::vector<float> kData(5 * 3 ) ;
+ bool MyGLRenderContext::getKaradaData(int index , int type  ,std::vector<float>& kData){
+//    std::vector<float> kData(5 * 3 ) ;
+
+    if(!dataSet || imageWidth ==0 || imageHeight == 0)
+        return false ;
 	switch (type) {
 		case 0 :  //koshi
         {
@@ -112,21 +117,21 @@ std::vector<float> MyGLRenderContext::getKaradaData(int index , int type){
 
         case 1 :
         {
-            kData[0 *3 ] = (karadaData[index][12 *3 ] *0.5+  karadaData[index][11 *3 ] * 0.5) * imageWidth ;
-            kData[0 *3 +1] = ((karadaData[index][12 *3 +1 ] + karadaData[index][11 *3 +1]) *0.33 + (karadaData[index][24 *3+1 ]+karadaData[index][23 * 3 +1 ]) *0.17) * imageHeight ;
-            kData[1 *3 ] =  kData[0 *3];
-            kData[1 *3 +1] =  kData[0 *3 +1];
-//            kData[0 * 3 ] = (karadaData[index][12 *3 ] * 7 /12 +  karadaData[index][24 *3 ] * 5 /12) * imageWidth;
-//            kData[0 *3 + 1] = (karadaData[index][12 *3 + 1  ]*7 /12 + karadaData[index][24 *3 + 1 ] * 5 / 12) * imageHeight;
-//            kData[1 * 3 ] = (karadaData[index][11 *3 ] * 7/12 + karadaData[index][23 * 3 ] * 5/12 ) * imageWidth;
-//            kData[1 *3 + 1] = (karadaData[index][11 *3 + 1  ]* 7/12 + karadaData[index][23 *3 + 1 ] * 5 /12) * imageHeight;
+//            kData[0 *3 ] = (karadaData[index][12 *3 ] *0.5+  karadaData[index][11 *3 ] * 0.5) * imageWidth ;
+//            kData[0 *3 +1] = ((karadaData[index][12 *3 +1 ] + karadaData[index][11 *3 +1]) *0.33 + (karadaData[index][24 *3+1 ]+karadaData[index][23 * 3 +1 ]) *0.17) * imageHeight ;
+//            kData[1 *3 ] =  kData[0 *3];
+//            kData[1 *3 +1] =  kData[0 *3 +1];
+            kData[0 * 3 ] = (karadaData[index][12 *3 ] * 2.0/3 +  karadaData[index][11 *3 ] * 1.0 /3) * imageWidth;
+            kData[0 *3 + 1] = (karadaData[index][12 *3 + 1]*8 /12 + karadaData[index][24 *3 + 1] * 4 / 12) * imageHeight;
+            kData[1 * 3 ] = (karadaData[index][11 *3 ] * 2.0/3 + karadaData[index][12 * 3 ] * 1.0/3 ) * imageWidth;
+            kData[1 *3 + 1] = (karadaData[index][11 *3 + 1]* 8/12 + karadaData[index][23 *3 + 1] * 4 /12) * imageHeight;
         }
         break ;
         case 2 :{
             break ;
         }
 	}
-    return kData;
+    return true;
 }
 
 
@@ -313,7 +318,6 @@ void MyGLRenderContext::DestroyInstance()
 		delete m_pContext;
 		m_pContext = nullptr;
 	}
-
 }
 
 void MyGLRenderContext::getImageSize(int& width , int& height){

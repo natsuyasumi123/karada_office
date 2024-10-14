@@ -1,7 +1,7 @@
 
 
 #include <gtc/matrix_transform.hpp>
-#include "MimiZoom.h"
+#include "MIMI_Zoom.h"
 #include "../util/GLUtils.h"
 
 
@@ -10,7 +10,7 @@ float RightEyePoint[] = {395, 360};
 float EyeRadius = 36;
 
 
-MimiZoom::MimiZoom()
+MIMI_Zoom::MIMI_Zoom()
 {
 
 	m_SamplerLoc = GL_NONE;
@@ -28,13 +28,13 @@ MimiZoom::MimiZoom()
 	m_FrameIndex = 0;
 }
 
-MimiZoom::~MimiZoom()
+MIMI_Zoom::~MIMI_Zoom()
 {
 	NativeImageUtil::FreeNativeImage(&m_RenderImage);
 
 }
 
-void MimiZoom::Init()
+void MIMI_Zoom::Init()
 {
 	if(m_ProgramObj)
 		return;
@@ -97,7 +97,7 @@ void MimiZoom::Init()
 	}
 	else
 	{
-		LOGCATE("MimiZoom::Init create program fail");
+		LOGCATE("MIMI_Zoom::Init create program fail");
 	}
 
 	GLfloat verticesCoords[] = {
@@ -147,9 +147,9 @@ void MimiZoom::Init()
 
 }
 
-void MimiZoom::LoadImage(NativeImage *pImage)
+void MIMI_Zoom::LoadImage(NativeImage *pImage)
 {
-	LOGCATE("MimiZoom::LoadImage pImage = %p", pImage->ppPlane[0]);
+	LOGCATE("MIMI_Zoom::LoadImage pImage = %p", pImage->ppPlane[0]);
 	if (pImage)
 	{
 	    ScopedSyncLock lock(&m_Lock);
@@ -161,9 +161,9 @@ void MimiZoom::LoadImage(NativeImage *pImage)
 
 }
 
-void MimiZoom::Draw(int screenW, int screenH)
+void MIMI_Zoom::Draw(int screenW, int screenH)
 {
-	LOGCATE("MimiZoom::Draw() [w,h]=[%d,%d]", screenW, screenH);
+	LOGCATE("MIMI_Zoom::Draw() [w,h]=[%d,%d]", screenW, screenH);
 
 	if(m_ProgramObj == GL_NONE) return;
 
@@ -215,7 +215,7 @@ void MimiZoom::Draw(int screenW, int screenH)
 
 }
 
-void MimiZoom::Destroy()
+void MIMI_Zoom::Destroy()
 {
 	if (m_ProgramObj)
 	{
@@ -232,9 +232,9 @@ void MimiZoom::Destroy()
  * @param angleY 绕Y轴旋转度数
  * @param ratio 宽高比
  * */
-void MimiZoom::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio)
+void MIMI_Zoom::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio)
 {
-	LOGCATE("MimiZoom::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
+	LOGCATE("MIMI_Zoom::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
 	angleX = angleX % 360;
 	angleY = angleY % 360;
 
@@ -266,9 +266,9 @@ void MimiZoom::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, flo
 
 }
 
-void MimiZoom::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
+void MIMI_Zoom::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
 {
-	GLSampleBase::UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
+	AppBase::UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
 	m_AngleX = static_cast<int>(rotateX);
 	m_AngleY = static_cast<int>(rotateY);
 	m_ScaleX = scaleX;

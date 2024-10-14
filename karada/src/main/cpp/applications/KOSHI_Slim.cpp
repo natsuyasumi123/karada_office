@@ -1,7 +1,7 @@
 
 
 #include <gtc/matrix_transform.hpp>
-#include "koshiSlim.h"
+#include "KOSHI_Slim.h"
 #include "../util/GLUtils.h"
 #include "CommonDef.h"
 #include "MyGLRenderContext.h"
@@ -12,21 +12,25 @@ float RightCheekPoint11[2] = {};
 float LeftSlenderCtlPoint11[2] = {};
 float RightSlenderCtlPoint11[2] = {};
 
-void koshiSlim::initKoshiData() {
-    std::vector<float > koshiData = MyGLRenderContext::GetInstance()->getKaradaData(0 , 0  );
-    LeftCheekKeyPoint11[0] = koshiData[0 *3 ]   ;
-    LeftCheekKeyPoint11[1] = koshiData[ 0* 3 + 1];
-    ChinKeyPoint11[0] = koshiData[1 *3 ]   ;
-    ChinKeyPoint11[1] = koshiData[ 1* 3 + 1];
-    RightCheekPoint11[0] = koshiData[2 *3 ]  ;
-    RightCheekPoint11[1] = koshiData[ 2* 3 + 1];
-    LeftSlenderCtlPoint11[0] = koshiData[3 *3 ]  ;
-    LeftSlenderCtlPoint11[1] = koshiData[3 *3 + 1];
-    RightSlenderCtlPoint11[0] = koshiData[4 *3 ] ;
-    RightSlenderCtlPoint11[1] =koshiData[4 *3 + 1 ] ;
+void KOSHI_Slim::initKoshiData() {
+    std::vector<float> koshiData(5 * 3 ) ; ;
+    bool ret =  MyGLRenderContext::GetInstance()->getKaradaData(0 , 0 ,koshiData );
+    if(ret){
+        LeftCheekKeyPoint11[0] = koshiData[0 *3 ]   ;
+        LeftCheekKeyPoint11[1] = koshiData[ 0* 3 + 1];
+        ChinKeyPoint11[0] = koshiData[1 *3 ]   ;
+        ChinKeyPoint11[1] = koshiData[ 1* 3 + 1];
+        RightCheekPoint11[0] = koshiData[2 *3 ]  ;
+        RightCheekPoint11[1] = koshiData[ 2* 3 + 1];
+        LeftSlenderCtlPoint11[0] = koshiData[3 *3 ]  ;
+        LeftSlenderCtlPoint11[1] = koshiData[3 *3 + 1];
+        RightSlenderCtlPoint11[0] = koshiData[4 *3 ] ;
+        RightSlenderCtlPoint11[1] =koshiData[4 *3 + 1 ] ;
+    }
+
 }
 
-koshiSlim::koshiSlim()
+KOSHI_Slim::KOSHI_Slim()
 {
 
     m_SamplerLoc = GL_NONE;
@@ -47,7 +51,7 @@ koshiSlim::koshiSlim()
 
 }
 
-koshiSlim::~koshiSlim()
+KOSHI_Slim::~KOSHI_Slim()
 {
     NativeImageUtil::FreeNativeImage(&m_RenderImage);
 
@@ -55,11 +59,11 @@ koshiSlim::~koshiSlim()
 
 
 
-void koshiSlim::Init()
+void KOSHI_Slim::Init()
 {
     if(m_ProgramObj)
         return;
-    initKoshiData();
+
     char vShaderStr[] =
             "#version 300 es\n"
             "layout(location = 0) in vec4 a_position;\n"
@@ -146,7 +150,7 @@ void koshiSlim::Init()
     }
     else
     {
-        LOGCATE("koshiSlim::Init create program fail");
+        LOGCATE("KOSHI_Slim::Init create program fail");
     }
 
     GLfloat verticesCoords[] = {
@@ -194,9 +198,9 @@ void koshiSlim::Init()
     glBindVertexArray(GL_NONE);
 }
 
-void koshiSlim::LoadImage(NativeImage *pImage)
+void KOSHI_Slim::LoadImage(NativeImage *pImage)
 {
-    LOGCATE("koshiSlim::LoadImage pImage = %p", pImage->ppPlane[0]);
+    LOGCATE("KOSHI_Slim::LoadImage pImage = %p", pImage->ppPlane[0]);
     if (pImage)
     {
         ScopedSyncLock lock(&m_Lock);
@@ -208,12 +212,12 @@ void koshiSlim::LoadImage(NativeImage *pImage)
 
 }
 
-void koshiSlim::Draw(int screenW, int screenH)
+void KOSHI_Slim::Draw(int screenW, int screenH)
 {
-    LOGCATE("koshiSlim::Draw() [w,h]=[%d,%d]", screenW, screenH);
+    LOGCATE("KOSHI_Slim::Draw() [w,h]=[%d,%d]", screenW, screenH);
 
     if(m_ProgramObj == GL_NONE) return;
-
+    initKoshiData();
     if(m_TextureId == GL_NONE)
     {
         ScopedSyncLock lock(&m_Lock);
@@ -253,7 +257,7 @@ void koshiSlim::Draw(int screenW, int screenH)
     float ratio = degree ; 
 
     float effectRadius = PointUtil::Distance(PointF(LeftCheekKeyPoint11[0], LeftCheekKeyPoint11[1]), PointF(ChinKeyPoint11[0], ChinKeyPoint11[1])) / 2;
-    LOGCATE("koshiSlim::Draw() ratio=%f, effectRadius=%f", ratio, effectRadius);
+    LOGCATE("KOSHI_Slim::Draw() ratio=%f, effectRadius=%f", ratio, effectRadius);
     GLUtils::setFloat(m_ProgramObj, "u_reshapeRatio", ratio);
     GLUtils::setFloat(m_ProgramObj, "u_reshapeRadius", effectRadius);
     GLUtils::setVec4(m_ProgramObj, "u_preCtrlPoints",
@@ -275,7 +279,7 @@ void koshiSlim::Draw(int screenW, int screenH)
 
 }
 
-void koshiSlim::Destroy()
+void KOSHI_Slim::Destroy()
 {
     if (m_ProgramObj)
     {
@@ -292,9 +296,9 @@ void koshiSlim::Destroy()
  * @param angleY 绕Y轴旋转度数
  * @param ratio 宽高比
  * */
-void koshiSlim::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio)
+void KOSHI_Slim::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio)
 {
-    LOGCATE("koshiSlim::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
+    LOGCATE("KOSHI_Slim::UpdateMVPMatrix angleX = %d, angleY = %d, ratio = %f", angleX, angleY, ratio);
     angleX = angleX % 360;
     angleY = angleY % 360;
 
@@ -326,9 +330,9 @@ void koshiSlim::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, fl
 
 }
 
-void koshiSlim::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
+void KOSHI_Slim::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
 {
-    GLSampleBase::UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
+    AppBase::UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
     m_AngleX = static_cast<int>(rotateX);
     m_AngleY = static_cast<int>(rotateY);
     m_ScaleX = scaleX;

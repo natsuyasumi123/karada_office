@@ -6,7 +6,7 @@
 #include "vector"
 #include "stdint.h"
 #include <GLES3/gl3.h>
-#include "GLSampleBase.h"
+#include "AppBase.h"
 
 class MyGLRenderContext
 {
@@ -37,8 +37,8 @@ public:
     void setKaradaData(float *kData ,int index ,  int length) ;
     void setFaceData(float *kData ,int index ,  int length) ;
 
-	std::vector<float> getKaradaData(int index, int type) ;
-    std::vector<float> getFaceData(int index, int type) ;
+	bool getKaradaData(int index, int type ,std::vector<float>& kData) ;
+//    bool getFaceData(int index, int type, std::vector<float> ret) ;
 
     void setDegree(float degree) ;
 
@@ -49,13 +49,14 @@ public:
 
 private:
 	static MyGLRenderContext *m_pContext;
-	GLSampleBase *m_pBeforeSample;
-	GLSampleBase *m_pCurSample;
-	int m_ScreenW;
-	int m_ScreenH;
-    int imageWidth;
-    int imageHeight;
+	AppBase *m_pBeforeSample;
+	AppBase *m_pCurSample;
+	int m_ScreenW = 0 ;
+	int m_ScreenH = 0 ;
+    int imageWidth = 0 ;
+    int imageHeight = 0 ;
     GLfloat karadaData[10][33 * 3 ] = {};
+    bool dataSet = false ;
     GLfloat faceData[10][33 * 3 ] = {};
 };
 

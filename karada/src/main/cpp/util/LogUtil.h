@@ -7,17 +7,17 @@
 #include <sys/time.h>
 
 #define  LOG_TAG "karada"
-//#define  OPEN_LOG 0
+#define  OPEN_LOG 0
 #ifdef  OPEN_LOG
 #define  LOGCATE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 #define  LOGCATV(...)  __android_log_print(ANDROID_LOG_VERBOSE,LOG_TAG,__VA_ARGS__)
 #define  LOGCATD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 #define  LOGCATI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #else
-#define  LOGCATE(...)
-#define  LOGCATV(...)
-#define  LOGCATD(...)
-#define  LOGCATI(...)
+//#define  LOGCATE(...)
+//#define  LOGCATV(...)
+//#define  LOGCATD(...)
+//#define  LOGCATI(...)
 #endif
 
 #define FUN_BEGIN_TIME(FUN) {\

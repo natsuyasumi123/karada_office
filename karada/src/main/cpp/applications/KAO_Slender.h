@@ -7,14 +7,14 @@
 #include <detail/type_mat.hpp>
 #include <detail/type_mat4x4.hpp>
 #include <ByteFlowLock.h>
-#include "GLSampleBase.h"
+#include "AppBase.h"
 
-class kaoSlender : public GLSampleBase
+class KAO_Slender : public AppBase
 {
 public:
-	kaoSlender();
+	KAO_Slender();
 
-	virtual ~kaoSlender();
+	virtual ~KAO_Slender();
 
 	virtual void LoadImage(NativeImage *pImage);
 
