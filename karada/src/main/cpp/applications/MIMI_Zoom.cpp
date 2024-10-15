@@ -3,6 +3,7 @@
 #include <gtc/matrix_transform.hpp>
 #include "MIMI_Zoom.h"
 #include "../util/GLUtils.h"
+#include "MyGLRenderContext.h"
 
 
 float LeftEyePoint[] = {283, 361};
@@ -33,12 +34,22 @@ MIMI_Zoom::~MIMI_Zoom()
 	NativeImageUtil::FreeNativeImage(&m_RenderImage);
 
 }
+void MIMI_Zoom::initMIMIdata(){
+    std::vector<float> kaoData(5 * 3 ) ;
+    bool ret = MyGLRenderContext::GetInstance()->getKaradaData(0 , 2 ,kaoData);
+    if(ret){
+         LeftEyePoint[0 *3 ] = kaoData[0 *3];
+         LeftEyePoint[0*3 +1] = kaoData[0 *3 + 1];
+         RightEyePoint[0 *3 ] = kaoData[1 *3 ];
+         RightEyePoint[0 *3 +1] =kaoData[1 *3 +1];
+         EyeRadius = kaoData[2 *3 ]/2 + kaoData[2 *3 +1] /2  ;
+    }
+}
 
 void MIMI_Zoom::Init()
 {
 	if(m_ProgramObj)
 		return;
-
 	char vShaderStr[] =
             "#version 300 es\n"
             "layout(location = 0) in vec4 a_position;\n"
@@ -183,10 +194,9 @@ void MIMI_Zoom::Draw(int screenW, int screenH)
         }
         return;
     }
-
+    initMIMIdata();
 	glViewport(0, 0, screenW, screenH);
 
-	m_FrameIndex ++;
 	UpdateMVPMatrix(m_MVPMatrix, m_AngleX, m_AngleY, (float)screenW / screenH);
 
 	// Use the program object
@@ -201,8 +211,7 @@ void MIMI_Zoom::Draw(int screenW, int screenH)
 	glBindTexture(GL_TEXTURE_2D, m_TextureId);
 	glUniform1i(m_SamplerLoc, 0);
 
-    float offset = (m_FrameIndex % 100) * 1.0f / 100;
-    offset = (m_FrameIndex / 100) % 2 == 1 ? (1 - offset) : offset;
+    float offset = degree  ;
 
 	GLUtils::setFloat(m_ProgramObj, "u_ScaleRatio", offset * 1.6f);
 	GLUtils::setFloat(m_ProgramObj, "u_Radius", EyeRadius);
