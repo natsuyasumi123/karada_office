@@ -57,7 +57,7 @@ private:
     int imageHeight = 0 ;
     GLfloat karadaData[10][33 * 3 ] = {};
     bool dataSet = false ;
-    GLfloat faceData[10][33 * 3 ] = {};
+    GLfloat faceData[10][478 * 3 ] = {};
 };
 
 

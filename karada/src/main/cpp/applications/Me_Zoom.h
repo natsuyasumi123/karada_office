@@ -9,12 +9,12 @@
 #include <ByteFlowLock.h>
 #include "AppBase.h"
 
-class MIMI_Zoom : public AppBase
+class Me_Zoom : public AppBase
 {
 public:
-	MIMI_Zoom();
+	Me_Zoom();
 
-	virtual ~MIMI_Zoom();
+	virtual ~Me_Zoom();
 
 	virtual void LoadImage(NativeImage *pImage);
 

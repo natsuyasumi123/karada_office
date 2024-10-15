@@ -4,7 +4,7 @@
 #include <MUNE_Burst.h>
 #include "MyGLRenderContext.h"
 #include "LogUtil.h"
-#include "MIMI_Zoom.h"
+#include "Me_Zoom.h"
 #include "KAO_Slender.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
@@ -44,7 +44,7 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
 		switch (value0)
 		{
             case SAMPLE_TYPE_KEY_BIG_EYES:
-                m_pCurSample = new MIMI_Zoom();
+                m_pCurSample = new Me_Zoom();
 				buhinSize = 8 * 3 ; // 1,2,3,4,5,6,7,8
                 break;
 			case SAMPLE_TYPE_KEY_shrink_koshi:
@@ -115,12 +115,8 @@ void MyGLRenderContext::setDegree(float degree){
         }
         break ;
 
-        case 1 :
+        case 1 ://mune
         {
-//            kData[0 *3 ] = (karadaData[index][12 *3 ] *0.5+  karadaData[index][11 *3 ] * 0.5) * imageWidth ;
-//            kData[0 *3 +1] = ((karadaData[index][12 *3 +1 ] + karadaData[index][11 *3 +1]) *0.33 + (karadaData[index][24 *3+1 ]+karadaData[index][23 * 3 +1 ]) *0.17) * imageHeight ;
-//            kData[1 *3 ] =  kData[0 *3];
-//            kData[1 *3 +1] =  kData[0 *3 +1];
             kData[0 * 3 ] = (karadaData[index][12 *3 ] * 2.0/3 +  karadaData[index][11 *3 ] * 1.0 /3) * imageWidth;
             kData[0 *3 + 1] = (karadaData[index][12 *3 + 1]*8 /12 + karadaData[index][24 *3 + 1] * 4 / 12) * imageHeight;
             kData[1 * 3 ] = (karadaData[index][11 *3 ] * 2.0/3 + karadaData[index][12 * 3 ] * 1.0/3 ) * imageWidth;
@@ -128,30 +124,26 @@ void MyGLRenderContext::setDegree(float degree){
         }
 
         break ;
-        case 2 :{
-            kData[0 *3 + 0] = karadaData[index][5 *3 ] * imageWidth ;
-            kData[0 *3 + 1] = karadaData[index][5 *3  + 1 ] * imageHeight ;
-            kData[1 *3 + 0] = karadaData[index][2 *3 ]   * imageWidth ;
-            kData[1 *3 + 1] = karadaData[index][2 *3 +1]  * imageHeight ;
-            kData[2 *3 + 0] = (karadaData[index][4 *3 ] - karadaData[index][6 *3 ] ) *imageWidth;
-            kData[2 *3 + 1] = (karadaData[index][3 *3 ] - karadaData[index][1 *3 ] )* imageHeight;
+        case 2 :{ // me
+            kData[0 *3 + 0 ] = faceData[index][468 *3 ] * imageWidth ;
+            kData[0 *3 + 1] = faceData[index][468 *3  + 1 ] * imageHeight ;
+            kData[1 *3 + 0] = faceData[index][473 *3 ]   * imageWidth ;
+            kData[1 *3 + 1] = faceData[index][473 *3 +1]  * imageHeight ;
+            kData[2 *3 + 0] = (faceData[index][133 *3 ] - faceData[index][130 *3 ] ) *imageWidth;
+            kData[2 *3 + 1] = (faceData[index][263 *3 ] - faceData[index][463 *3 ] )* imageWidth;
         }
-            break ;
-        case 3 :{
-            kData[0 *3 + 0] = karadaData[index][8 *3 ] * imageWidth ;
-            kData[0 *3 + 1] = karadaData[index] [8 *3  + 1 ] * imageHeight ;
-            kData[1 *3 + 0] =(karadaData[index][9 *3 ] + karadaData[index][10 *3]) /2 * imageWidth ;
-            kData[1 *3 + 1] =((karadaData[index][9 *3 +1] + karadaData[index][10 *3 +1]) - karadaData[index][0*3 +1 ]) * imageHeight ;
-            kData[2*3 +0] =karadaData[index][7 *3 ] * imageWidth ;
-            kData[2*3 +1] =karadaData[index][7 *3 +1] * imageHeight ;
-            kData[3*3 +0] =karadaData[index][10 *3 ] * imageWidth ;
-//            kData[3*3 +1] =karadaData[index][10 *3 +1 ] * imageHeight ;
-            kData[3*3 +1] =(karadaData[index][10 *3 +1 ] + (karadaData[index][10*3 +1] - karadaData[index][8 *3 +1])/3) * imageHeight ;
-            kData[4*3 +0] =karadaData[index][9 *3 ] * imageWidth  ;
-            kData[4*3 +1] =(karadaData[index][9 *3 +1 ] + (karadaData[index][9*3 +1] - karadaData[index][7 *3 +1]) /3) * imageHeight ;
-            float kaoWidth = kData[4 *3] - kData[3*3] ;
-            kData[4 *3 ] += kaoWidth ;
-            kData[3*3] -= kaoWidth;
+        break ;
+        case 3 :{ //kao
+            kData[0 *3 + 0] = faceData[index][127 *3 ] * imageWidth ;
+            kData[0 *3 + 1] = faceData[index] [127 *3  + 1 ] * imageHeight ;
+            kData[1 *3 + 0] =faceData[index][152 *3 ]  * imageWidth ;
+            kData[1 *3 + 1] =faceData[index][152 *3 +1]  * imageHeight ;
+            kData[2*3 +0] =faceData[index][356 *3 ] * imageWidth ;
+            kData[2*3 +1] =faceData[index][356 *3 +1] * imageHeight ;
+            kData[3*3 +0] =faceData[index][58 *3 ] * imageWidth ;
+            kData[3*3 +1] =faceData[index][58 *3 +1 ]  * imageHeight ;
+            kData[4*3 +0] =faceData[index][367 *3 ] * imageWidth  ;
+            kData[4*3 +1] =faceData[index][367 *3 +1 ] * imageHeight ;
             break ;
         }
 	}
