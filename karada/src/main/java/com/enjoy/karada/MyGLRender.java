@@ -50,7 +50,7 @@ public class MyGLRender implements GLSurfaceView.Renderer {
     }
 
     public void setParamsInt(int paramType, int value0, int value1) {
-        if (paramType == SAMPLE_TYPE) {
+        if (paramType == TYPE_BASE) {
             mSampleType = value0;
         }
         mNativeRender.native_SetParamsInt(paramType, value0, value1);

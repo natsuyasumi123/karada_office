@@ -3,16 +3,16 @@
 package com.enjoy.karada;
 
 public class MyNativeRender {
-    public static final int SAMPLE_TYPE  =  200;
+    public static final int TYPE_BASE  =  200;
 
-    public static final int SAMPLE_TYPE_KEY_SHRINK_KOSHI      = SAMPLE_TYPE + 0;
-//    public static final int SAMPLE_TYPE_KEY_BIG_BREAST      = SAMPLE_TYPE + 1;
-//    public static final int SAMPLE_TYPE_KEY_BIG_EYES            = SAMPLE_TYPE + 2;
-//    public static final int SAMPLE_TYPE_KEY_FACE_SLENDER        = SAMPLE_TYPE + 3;
+    public static final int SAMPLE_TYPE_KEY_SHRINK_KOSHI      = TYPE_BASE + 0;
+//    public static final int SAMPLE_TYPE_KEY_BIG_BREAST      = TYPE_BASE + 1;
+//    public static final int SAMPLE_TYPE_KEY_BIG_EYES            = TYPE_BASE + 2;
+//    public static final int SAMPLE_TYPE_KEY_FACE_SLENDER        = TYPE_BASE + 3;
 //
 //
-//    public static final int SAMPLE_TYPE_SET_TOUCH_LOC           = SAMPLE_TYPE + 999;
-//    public static final int SAMPLE_TYPE_SET_GRAVITY_XY          = SAMPLE_TYPE + 1000;
+//    public static final int SAMPLE_TYPE_SET_TOUCH_LOC           = TYPE_BASE + 999;
+//    public static final int SAMPLE_TYPE_SET_GRAVITY_XY          = TYPE_BASE + 1000;
 
 
     static {

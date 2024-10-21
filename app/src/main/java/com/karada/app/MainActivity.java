@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.hardware.SensorManager;
 import androidx.annotation.*;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +20,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -54,16 +51,13 @@ import com.google.mediapipe.tasks.vision.core.RunningMode;
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarker;
 import com.google.mediapipe.tasks.vision.poselandmarker.PoseLandmarkerResult;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,13 +84,14 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
             "腰KOSHI SHRINK" ,
             "胸MUNE BURST ",
             "👀ME ADJUST(unfinished)",
-            "☺KAO SLENDER"
+            "☺KAO SLENDER",
+            "髋HIPPU ADJUST"
     };
 
     private MyGLSurfaceView mGLSurfaceView;
     private ViewGroup mRootView;
     private SeekBar seekBar ;
-    private int mSampleSelectedIndex = SAMPLE_TYPE_KEY_SHRINK_KOSHI - SAMPLE_TYPE;
+    private int mSampleSelectedIndex = SAMPLE_TYPE_KEY_SHRINK_KOSHI - TYPE_BASE;
     private MyGLRender mGLRender = new MyGLRender();
     private SensorManager mSensorManager;
     private PoseLandmarker landmarker ;
@@ -203,26 +198,19 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                     }
                     if (bitmap != null) {
                         mGLSurfaceView.setAspectRatio(bitmap.getWidth(), bitmap.getHeight());
-
                         int bytes = bitmap.getByteCount();
                         ByteBuffer buf = ByteBuffer.allocate(bytes);
                         bitmap.copyPixelsToBuffer(buf);
                         byte[] byteArray = buf.array();
-                        mGLRender.setParamsInt(SAMPLE_TYPE, mSampleSelectedIndex + SAMPLE_TYPE, 0);
+                        mGLRender.setParamsInt(TYPE_BASE, mSampleSelectedIndex + TYPE_BASE, 0);
                         mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray , landMarks , faceMarks);//设置图片
-
-//                        mGLRender.setMarksData(landMarks , null);//设置人体信息数据
-
-
-
-//                        mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray);//设置图片
                     }
                     if (mask != null) {
                         int bytes = mask.getByteCount();
                         ByteBuffer buf = ByteBuffer.allocate(bytes);
                         mask.copyPixelsToBuffer(buf);
                         byte[] byteArray = buf.array();
-                        mGLRender.setOutlineData(byteArray , IMAGE_FORMAT_GRAY, mask.getWidth(), mask.getHeight() );//设置图片
+                        mGLRender.setOutlineData(byteArray , IMAGE_FORMAT_GRAY, mask.getWidth(), mask.getHeight());//设置图片
                     }
                 });
             }
@@ -259,20 +247,9 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
 //            }
 //        }
 
-//        when(currentModel) {
-//            MODEL_DEEPLABV3 -> {
+
                 baseOptionsBuilder.setModelAssetPath("mediapipe_models/segmenters/selfie_multiclass.tflite");
-//            }
-//            MODEL_HAIR_SEGMENTER -> {
-//                baseOptionsBuilder.setModelAssetPath(MODEL_HAIR_SEGMENTER_PATH)
-//            }
-//            MODEL_SELFIE_SEGMENTER -> {
-//                baseOptionsBuilder.setModelAssetPath(MODEL_SELFIE_SEGMENTER_PATH)
-//            }
-//            MODEL_SELFIE_MULTICLASS -> {
-//                baseOptionsBuilder.setModelAssetPath(MODEL_SELFIE_MULTICLASS_PATH)
-//            }
-//        }
+
         RunningMode runningMode  = RunningMode.IMAGE;
         BaseOptions baseOptions = baseOptionsBuilder.build();
         ImageSegmenter.ImageSegmenterOptions.Builder optionsBuilder = ImageSegmenter.ImageSegmenterOptions.builder()
@@ -280,23 +257,12 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                 .setBaseOptions(baseOptions)
                 .setOutputCategoryMask(true)
                 .setOutputConfidenceMasks(false) ;
-
-//        if (runningMode == RunningMode.LIVE_STREAM) {
-//            optionsBuilder.setResultListener((result, input) -> {
-//
-//            }).setErrorListener(e -> {
-//
-//            });
-//        }
-
         ImageSegmenter.ImageSegmenterOptions options = optionsBuilder.build() ;
         imagesegmenter = ImageSegmenter.createFromOptions(getApplicationContext(), options) ;
     }
 
     private void createFaceMarker(){
         BaseOptions.Builder baseOptionsBuilder = BaseOptions.builder().setModelAssetPath("mediapipe_models/face_landmarker.task") ;
-//        BaseOptions baseOptions = baseOptionsBuilder.build() ;
-
         FaceLandmarker.FaceLandmarkerOptions.Builder optionsBuilder =
                 FaceLandmarker.FaceLandmarkerOptions.builder()
                         .setBaseOptions(baseOptionsBuilder.build())

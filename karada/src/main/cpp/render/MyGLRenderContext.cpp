@@ -6,6 +6,7 @@
 #include "LogUtil.h"
 #include "Me_Zoom.h"
 #include "KAO_Slender.h"
+#include "HIPPU_Adjust.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
@@ -36,29 +37,27 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
 {
 	LOGCATE("MyGLRenderContext::SetParamsInt paramType = %d, value0 = %d, value1 = %d", paramType, value0, value1);
 
-	if (paramType == SAMPLE_TYPE)
+	if (paramType == TYPE_BASE)
 	{
 		m_pBeforeSample = m_pCurSample;
-		int buhinSize = 0 ;
 		LOGCATE("MyGLRenderContext::SetParamsInt 0 m_pBeforeSample = %p", m_pBeforeSample);
 		switch (value0)
 		{
             case SAMPLE_TYPE_KEY_BIG_EYES:
                 m_pCurSample = new Me_Zoom();
-				buhinSize = 8 * 3 ; // 1,2,3,4,5,6,7,8
                 break;
 			case SAMPLE_TYPE_KEY_shrink_koshi:
 				m_pCurSample = new KOSHI_Slim();
-				buhinSize = 4 *3 ;// shouder 11,12 ; // koshi 23, 24
 				break;
 			case SAMPLE_TYPE_KEY_BIG_BREAST:
 				m_pCurSample = new MUNE_Burst() ;
-				buhinSize = 4 * 3  ; //shouder 11,12 ; // koshi 23, 24
 				break ;
 			case SAMPLE_TYPE_KEY_FACE_SLENDER:
 				m_pCurSample = new KAO_Slender();
-				buhinSize = 6 *3 ;
 				break;
+            case SAMPLE_TYPE_HIPPU_ADJUST :
+                m_pCurSample = new HIPPU_Adjust() ;
+                break;
 			default:
 			    m_pCurSample = nullptr;
 				break;
@@ -145,6 +144,20 @@ void MyGLRenderContext::setDegree(float degree){
             kData[4*3 +0] =faceData[index][367 *3 ] * imageWidth  ;
             kData[4*3 +1] =faceData[index][367 *3 +1 ] * imageHeight ;
             break ;
+        case 4:{ //hippu
+            kData[0 *3 + 0] = karadaData[index][24 *3  ] * imageWidth ;
+            kData[0 *3 + 1] = karadaData[index] [24 *3  + 1 ] * imageHeight ;
+            kData[1 *3 + 0] =(karadaData[index][25 *3 ] /2 +karadaData[index][26 *3 ] /2) * imageWidth ;
+            kData[1 *3 + 1] =(karadaData[index][25 *3 + 1 ] /2 +karadaData[index][26 *3 + 1] /2)  * imageHeight ;
+            kData[2*3 +0] =karadaData[index][23 *3 ] * imageWidth  ;
+            kData[2*3 +1] =karadaData[index][23 *3 +1] * imageHeight ;
+            int hippuWidth = (karadaData[index][23 * 3 ] - karadaData[index][24 *3 ]) * imageWidth ;
+            kData[3 *3 + 0] = karadaData[index][24 *3  ] * imageWidth - hippuWidth /3;
+            kData[3 *3 + 1] = karadaData[index] [24 *3  + 1 ] * imageHeight ;
+            kData[4*3 +0] =karadaData[index][23 *3 ] * imageWidth + hippuWidth /3  ;
+            kData[4*3 +1] =karadaData[index][23 *3 +1] * imageHeight ;
+            break ;
+        }
         }
 	}
     return true;

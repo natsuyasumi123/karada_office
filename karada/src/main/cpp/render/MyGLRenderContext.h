@@ -8,6 +8,12 @@
 #include <GLES3/gl3.h>
 #include "AppBase.h"
 
+//struct KaradaData{ //粗略保留身体尺寸数据
+//    int rawHeadSize ;
+//    int rawLegLength ;
+//
+//};
+
 class MyGLRenderContext
 {
 	MyGLRenderContext();

@@ -11,15 +11,16 @@
 //For PI define
 #define MATH_PI 3.1415926535897932384626433832802
 
-#define SAMPLE_TYPE                             200
-#define SAMPLE_TYPE_KEY_BIG_EYES                SAMPLE_TYPE + 2
-#define SAMPLE_TYPE_KEY_FACE_SLENDER            SAMPLE_TYPE + 3
-#define SAMPLE_TYPE_KEY_shrink_koshi            SAMPLE_TYPE + 0
-#define SAMPLE_TYPE_KEY_BIG_BREAST		        SAMPLE_TYPE + 1
+#define TYPE_BASE                             200
 
+#define SAMPLE_TYPE_KEY_shrink_koshi            TYPE_BASE + 0
+#define SAMPLE_TYPE_KEY_BIG_BREAST		        TYPE_BASE + 1
+#define SAMPLE_TYPE_KEY_BIG_EYES                TYPE_BASE + 2
+#define SAMPLE_TYPE_KEY_FACE_SLENDER            TYPE_BASE + 3
+#define SAMPLE_TYPE_HIPPU_ADJUST                TYPE_BASE + 4
 
-#define SAMPLE_TYPE_KEY_SET_TOUCH_LOC           SAMPLE_TYPE + 999
-#define SAMPLE_TYPE_SET_GRAVITY_XY              SAMPLE_TYPE + 1000
+#define SAMPLE_TYPE_KEY_SET_TOUCH_LOC           TYPE_BASE + 999
+#define SAMPLE_TYPE_SET_GRAVITY_XY              TYPE_BASE + 1000
 
 #define DEFAULT_OGL_ASSETS_DIR "/sdcard/Android/data/com.karada.app/files/Download"
 class AppBase
