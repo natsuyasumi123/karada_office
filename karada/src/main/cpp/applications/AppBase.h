@@ -18,6 +18,7 @@
 #define SAMPLE_TYPE_KEY_BIG_EYES                TYPE_BASE + 2
 #define SAMPLE_TYPE_KEY_FACE_SLENDER            TYPE_BASE + 3
 #define SAMPLE_TYPE_HIPPU_ADJUST                TYPE_BASE + 4
+#define SAMPLE_TYPE_NAKA_TRIM                   TYPE_BASE + 5
 
 #define SAMPLE_TYPE_KEY_SET_TOUCH_LOC           TYPE_BASE + 999
 #define SAMPLE_TYPE_SET_GRAVITY_XY              TYPE_BASE + 1000

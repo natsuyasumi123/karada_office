@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
             "胸MUNE BURST ",
             "👀ME ADJUST(unfinished)",
             "☺KAO SLENDER",
-            "髋HIPPU ADJUST"
+            "髋HIPPU ADJUST",
+            "腹NAKA TRIM"
     };
 
     private MyGLSurfaceView mGLSurfaceView;

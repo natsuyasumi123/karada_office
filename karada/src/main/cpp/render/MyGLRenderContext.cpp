@@ -7,6 +7,7 @@
 #include "Me_Zoom.h"
 #include "KAO_Slender.h"
 #include "HIPPU_Adjust.h"
+#include "NAKA_Trim.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
@@ -58,6 +59,9 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
             case SAMPLE_TYPE_HIPPU_ADJUST :
                 m_pCurSample = new HIPPU_Adjust() ;
                 break;
+            case SAMPLE_TYPE_NAKA_TRIM:
+                m_pCurSample = new NAKA_Trim() ;
+                break ;
 			default:
 			    m_pCurSample = nullptr;
 				break;
@@ -114,7 +118,7 @@ void MyGLRenderContext::setDegree(float degree){
         }
         break ;
 
-        case 1 ://mune
+        case 1 ://胸
         {
             kData[0 * 3 ] = (karadaData[index][12 *3 ] * 2.0/3 +  karadaData[index][11 *3 ] * 1.0 /3) * imageWidth;
             kData[0 *3 + 1] = (karadaData[index][12 *3 + 1]*8 /12 + karadaData[index][24 *3 + 1] * 4 / 12) * imageHeight;
@@ -123,7 +127,7 @@ void MyGLRenderContext::setDegree(float degree){
         }
 
         break ;
-        case 2 :{ // me
+        case 2 :{ // 眼睛
             kData[0 *3 + 0 ] = faceData[index][468 *3 ] * imageWidth ;
             kData[0 *3 + 1] = faceData[index][468 *3  + 1 ] * imageHeight ;
             kData[1 *3 + 0] = faceData[index][473 *3 ]   * imageWidth ;
@@ -132,7 +136,7 @@ void MyGLRenderContext::setDegree(float degree){
             kData[2 *3 + 1] = (faceData[index][263 *3 ] - faceData[index][463 *3 ] )* imageWidth;
         }
         break ;
-        case 3 :{ //kao
+        case 3 :{ //脸
             kData[0 *3 + 0] = faceData[index][127 *3 ] * imageWidth ;
             kData[0 *3 + 1] = faceData[index] [127 *3  + 1 ] * imageHeight ;
             kData[1 *3 + 0] =faceData[index][152 *3 ]  * imageWidth ;
@@ -144,7 +148,7 @@ void MyGLRenderContext::setDegree(float degree){
             kData[4*3 +0] =faceData[index][367 *3 ] * imageWidth  ;
             kData[4*3 +1] =faceData[index][367 *3 +1 ] * imageHeight ;
             break ;
-        case 4:{ //hippu
+        case 4:{ //髋部
             kData[0 *3 + 0] = karadaData[index][24 *3  ] * imageWidth ;
             kData[0 *3 + 1] = karadaData[index] [24 *3  + 1 ] * imageHeight ;
             kData[1 *3 + 0] =(karadaData[index][25 *3 ] /2 +karadaData[index][26 *3 ] /2) * imageWidth ;
@@ -157,6 +161,20 @@ void MyGLRenderContext::setDegree(float degree){
             kData[4*3 +0] =karadaData[index][23 *3 ] * imageWidth + hippuWidth /3  ;
             kData[4*3 +1] =karadaData[index][23 *3 +1] * imageHeight ;
             break ;
+        }
+        case 5 : { //naka
+            kData[0 *3 + 0 ] = (karadaData[index][24 *3 ] /2 + karadaData[index][23 *3 ] /2)* imageWidth ;
+            kData[0 *3 + 1] =( (karadaData[index][24 *3 +1] /2 + karadaData[index][23 *3 +1] /2) * 3 /4
+                                + (karadaData[index][11 *3 +1] /2 + karadaData[index][12 *3 +1] /2) * 1 /4) * imageHeight ;
+            kData[1 *3 + 0] =  (karadaData[index][24 *3 ] /2 + karadaData[index][23 *3 ] /2)* imageWidth ;
+            kData[1 *3 + 1] = ( (karadaData[index][24 *3 +1] /2 + karadaData[index][23 *3 +1] /2) * 3 /4
+                                + (karadaData[index][11 *3 +1] /2 + karadaData[index][12 *3 +1] /2) * 1 /4) * imageHeight ;
+            kData[2 *3 + 0] = std::abs(karadaData[index][23 *3 ] - karadaData[index][24 *3 ] ) *imageWidth ;
+            kData[2 *3 + 1] =  std::abs(karadaData[index][23 *3 ] - karadaData[index][24 *3 ] ) *imageWidth ;
+            break ;
+        }
+        case 6 :{ //ashi
+
         }
         }
 	}
