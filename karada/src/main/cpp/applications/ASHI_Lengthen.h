@@ -2,8 +2,8 @@
 // Created by ByteFlow on 2019/7/16.
 //
 
-#ifndef NDK_OPENGLES_3_0_FBOLEGSAMPLE_H
-#define NDK_OPENGLES_3_0_FBOLEGSAMPLE_H
+#ifndef NDK_OPENGLES_3_0_FBOLEGAPP_H
+#define NDK_OPENGLES_3_0_FBOLEGAPP_H
 
 #include <detail/type_mat.hpp>
 #include <detail/type_mat4x4.hpp>
@@ -65,4 +65,4 @@ private:
 };
 
 
-#endif //NDK_OPENGLES_3_0_FBOLEGSAMPLE_H
+#endif //NDK_OPENGLES_3_0_FBOLEGAPP_H

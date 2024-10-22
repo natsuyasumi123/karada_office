@@ -489,13 +489,13 @@ private:
     float estimateSearchParams(SearchParams& searchParams)
     {
         const int nn = 1;
-        const size_t SAMPLE_COUNT = 1000;
+        const size_t APP_COUNT = 1000;
 
         assert(bestIndex_ != NULL); // must have a valid index
 
         float speedup = 0;
 
-        int samples = (int)std::min(dataset_.rows / 10, SAMPLE_COUNT);
+        int samples = (int)std::min(dataset_.rows / 10, APP_COUNT);
         if (samples > 0) {
             Matrix<ElementType> testDataset = random_sample(dataset_, samples);
 

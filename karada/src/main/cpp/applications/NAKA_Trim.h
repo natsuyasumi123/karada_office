@@ -48,4 +48,4 @@ private:
 };
 
 
-#endif //NDK_OPENGLES_3_0_BIGEYESSAMPLE_H
+#endif //NDK_OPENGLES_3_0_BIGEYESAPP_H

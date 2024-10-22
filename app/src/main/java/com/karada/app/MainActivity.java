@@ -80,19 +80,20 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
 
     private static final int PERMISSION_REQUEST_CODE = 1;
     private static final int PICK_MEDIA_REQUEST = 2;
-    private static final String[] SAMPLE_TITLES = {
+    private static final String[] APP_TITLES = {
             "腰KOSHI SHRINK" ,
             "胸MUNE BURST ",
-            "👀ME ADJUST(unfinished)",
-            "☺KAO SLENDER",
+            "眼ME ADJUST(unfinished)",
+            "脸KAO SLENDER",
             "髋HIPPU ADJUST",
-            "腹NAKA TRIM"
+            "腹NAKA TRIM" ,
+            "腿ASHI LENGTHEN"
     };
 
     private MyGLSurfaceView mGLSurfaceView;
     private ViewGroup mRootView;
     private SeekBar seekBar ;
-    private int mSampleSelectedIndex = SAMPLE_TYPE_KEY_SHRINK_KOSHI - TYPE_BASE;
+    private int mSampleSelectedIndex = TYPE_KEY_SHRINK_KOSHI - TYPE_BASE;
     private MyGLRender mGLRender = new MyGLRender();
     private SensorManager mSensorManager;
     private PoseLandmarker landmarker ;
@@ -520,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         Button confirmBtn = rootView.findViewById(R.id.confirm_btn);
         confirmBtn.setOnClickListener(v -> dialog.cancel());
         final RecyclerView resolutionsListView = rootView.findViewById(R.id.resolution_list_view);
-        final MyRecyclerViewAdapter myPreviewSizeViewAdapter = new MyRecyclerViewAdapter(this, Arrays.asList(SAMPLE_TITLES));
+        final MyRecyclerViewAdapter myPreviewSizeViewAdapter = new MyRecyclerViewAdapter(this, Arrays.asList(APP_TITLES));
         myPreviewSizeViewAdapter.setSelectIndex(mSampleSelectedIndex);
         myPreviewSizeViewAdapter.addOnItemClickListener((view, position) -> {
             onFuncItemSelected(position);

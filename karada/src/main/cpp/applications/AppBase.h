@@ -1,7 +1,7 @@
 
 
-#ifndef NDK_OPENGLES_3_0_GLSAMPLEBASE_H
-#define NDK_OPENGLES_3_0_GLSAMPLEBASE_H
+#ifndef NDK_OPENGLES_3_0_GLAPPBASE_H
+#define NDK_OPENGLES_3_0_GLAPPBASE_H
 
 #include "stdint.h"
 #include <GLES3/gl3.h>
@@ -13,15 +13,16 @@
 
 #define TYPE_BASE                             200
 
-#define SAMPLE_TYPE_KEY_shrink_koshi            TYPE_BASE + 0
-#define SAMPLE_TYPE_KEY_BIG_BREAST		        TYPE_BASE + 1
-#define SAMPLE_TYPE_KEY_BIG_EYES                TYPE_BASE + 2
-#define SAMPLE_TYPE_KEY_FACE_SLENDER            TYPE_BASE + 3
-#define SAMPLE_TYPE_HIPPU_ADJUST                TYPE_BASE + 4
-#define SAMPLE_TYPE_NAKA_TRIM                   TYPE_BASE + 5
+#define TYPE_KEY_shrink_koshi            TYPE_BASE + 0
+#define TYPE_KEY_BIG_BREAST		         TYPE_BASE + 1
+#define TYPE_KEY_BIG_EYES                TYPE_BASE + 2
+#define TYPE_KEY_FACE_SLENDER            TYPE_BASE + 3
+#define TYPE_HIPPU_ADJUST                TYPE_BASE + 4
+#define TYPE_NAKA_TRIM                   TYPE_BASE + 5
+#define TYPE_ASHI_LENGTHEN               TYPE_BASE + 6
 
-#define SAMPLE_TYPE_KEY_SET_TOUCH_LOC           TYPE_BASE + 999
-#define SAMPLE_TYPE_SET_GRAVITY_XY              TYPE_BASE + 1000
+#define TYPE_KEY_SET_TOUCH_LOC           TYPE_BASE + 999
+#define TYPE_SET_GRAVITY_XY              TYPE_BASE + 1000
 
 #define DEFAULT_OGL_ASSETS_DIR "/sdcard/Android/data/com.karada.app/files/Download"
 class AppBase
@@ -92,4 +93,4 @@ public :
 
 
 
-#endif //NDK_OPENGLES_3_0_GLSAMPLEBASE_H
+#endif //NDK_OPENGLES_3_0_GLAPPBASE_H

@@ -105,10 +105,10 @@ void ASHI_Lengthen::Init()
 	m_bIsVerticalMode = true;
 
 	RectF inRectF;
-	inRectF.left = 0.0f ;
-	inRectF.right = m_RenderImage.width;
-	inRectF.top = m_RenderImage.height * 0.5f;
-	inRectF.bottom = m_RenderImage.height;
+	inRectF.left =m_RenderImage.width/4 ;
+	inRectF.right = m_RenderImage.width *3 / 4;
+	inRectF.top = m_RenderImage.height  /4;
+	inRectF.bottom = m_RenderImage.height * 3/ 4;
 
 	m_StretchRect.left = inRectF.left / m_RenderImage.width;
 	m_StretchRect.right = inRectF.right / m_RenderImage.width;
@@ -131,7 +131,7 @@ void ASHI_Lengthen::Init()
 		}
 		else
 		{
-			m_StretchMode = VERTICAL_STRETCH_8_POINTS;
+			m_StretchMode = VERTICAL_STRETCH_8_POINTS ;
 		}
 	}
 	else
@@ -763,20 +763,6 @@ void ASHI_Lengthen::Draw(int screenW, int screenH)
 	glBindTexture(GL_TEXTURE_2D, GL_NONE);
 	glBindVertexArray(GL_NONE);
 
-//	glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
-//	NativeImage nativeImage = m_RenderImage;
-//	nativeImage.format = IMAGE_FORMAT_RGBA;
-//	nativeImage.height = static_cast<int>(m_RenderImage.height * (1 + 2 * m_dt));
-//	uint8_t *pBuffer = new uint8_t[nativeImage.width * nativeImage.height * 4];
-//
-//	nativeImage.ppPlane[0] = pBuffer;
-//	FUN_BEGIN_TIME("FBO glReadPixels")
-//		glReadPixels(0, 0, nativeImage.width, nativeImage.height, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
-//	FUN_END_TIME("FBO cost glReadPixels")
-//
-//	NativeImageUtil::DumpNativeImage(&nativeImage, "/sdcard/DCIM", "NDK");
-//	delete []pBuffer;
-//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }
 

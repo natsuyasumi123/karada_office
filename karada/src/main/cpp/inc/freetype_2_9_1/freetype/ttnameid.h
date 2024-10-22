@@ -813,7 +813,7 @@ FT_BEGIN_HEADER
 #define TT_NAME_ID_MAC_FULL_NAME          18
 
   /* The following code is new as of 2000-01-21 */
-#define TT_NAME_ID_SAMPLE_TEXT            19
+#define TT_NAME_ID_APP_TEXT            19
 
   /* This is new in OpenType 1.3 */
 #define TT_NAME_ID_CID_FINDFONT_NAME      20

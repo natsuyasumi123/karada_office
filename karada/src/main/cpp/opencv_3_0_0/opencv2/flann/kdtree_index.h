@@ -308,10 +308,10 @@ private:
         memset(mean_,0,veclen_*sizeof(DistanceType));
         memset(var_,0,veclen_*sizeof(DistanceType));
 
-        /* Compute mean values.  Only the first SAMPLE_MEAN values need to be
+        /* Compute mean values.  Only the first APP_MEAN values need to be
             sampled to get a good estimate.
          */
-        int cnt = std::min((int)SAMPLE_MEAN+1, count);
+        int cnt = std::min((int)APP_MEAN+1, count);
         for (int j = 0; j < cnt; ++j) {
             ElementType* v = dataset_[ind[j]];
             for (size_t k=0; k<veclen_; ++k) {
@@ -556,11 +556,11 @@ private:
     enum
     {
         /**
-         * To improve efficiency, only SAMPLE_MEAN random values are used to
+         * To improve efficiency, only APP_MEAN random values are used to
          * compute the mean and variance at each level when building a tree.
          * A value of 100 seems to perform as well as using all values.
          */
-        SAMPLE_MEAN = 100,
+        APP_MEAN = 100,
         /**
          * Top random dimensions to consider
          *

@@ -95,8 +95,8 @@ enum ErrorTypes
 /** @brief Sample types */
 enum SampleTypes
 {
-    ROW_SAMPLE = 0, //!< each training sample is a row of samples
-    COL_SAMPLE = 1  //!< each training sample occupies a column of samples
+    ROW_APP = 0, //!< each training sample is a row of samples
+    COL_APP = 1  //!< each training sample occupies a column of samples
 };
 
 /** @brief The structure represents the logarithmic grid range of statmodel parameters.
@@ -163,7 +163,7 @@ public:
     In current implementation the function tries to avoid physical data copying and returns the
     matrix stored inside TrainData (unless the transposition or compression is needed).
      */
-    CV_WRAP virtual Mat getTrainSamples(int layout=ROW_SAMPLE,
+    CV_WRAP virtual Mat getTrainSamples(int layout=ROW_APP,
                                 bool compressSamples=true,
                                 bool compressVars=true) const = 0;
 

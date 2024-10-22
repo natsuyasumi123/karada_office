@@ -8,6 +8,7 @@
 #include "KAO_Slender.h"
 #include "HIPPU_Adjust.h"
 #include "NAKA_Trim.h"
+#include "ASHI_Lengthen.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
@@ -44,23 +45,26 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
 		LOGCATE("MyGLRenderContext::SetParamsInt 0 m_pBeforeSample = %p", m_pBeforeSample);
 		switch (value0)
 		{
-            case SAMPLE_TYPE_KEY_BIG_EYES:
+            case TYPE_KEY_BIG_EYES:
                 m_pCurSample = new Me_Zoom();
                 break;
-			case SAMPLE_TYPE_KEY_shrink_koshi:
+			case TYPE_KEY_shrink_koshi:
 				m_pCurSample = new KOSHI_Slim();
 				break;
-			case SAMPLE_TYPE_KEY_BIG_BREAST:
+			case TYPE_KEY_BIG_BREAST:
 				m_pCurSample = new MUNE_Burst() ;
 				break ;
-			case SAMPLE_TYPE_KEY_FACE_SLENDER:
+			case TYPE_KEY_FACE_SLENDER:
 				m_pCurSample = new KAO_Slender();
 				break;
-            case SAMPLE_TYPE_HIPPU_ADJUST :
+            case TYPE_HIPPU_ADJUST :
                 m_pCurSample = new HIPPU_Adjust() ;
                 break;
-            case SAMPLE_TYPE_NAKA_TRIM:
+            case TYPE_NAKA_TRIM:
                 m_pCurSample = new NAKA_Trim() ;
+                break ;
+            case TYPE_ASHI_LENGTHEN:
+                m_pCurSample = new ASHI_Lengthen() ;
                 break ;
 			default:
 			    m_pCurSample = nullptr;
@@ -188,10 +192,10 @@ void MyGLRenderContext::SetParamsFloat(int paramType, float value0, float value1
 	{
 		switch (paramType)
 		{
-			case SAMPLE_TYPE_KEY_SET_TOUCH_LOC:
+			case TYPE_KEY_SET_TOUCH_LOC:
 				m_pCurSample->SetTouchLocation(value0, value1);
 				break;
-			case SAMPLE_TYPE_SET_GRAVITY_XY:
+			case TYPE_SET_GRAVITY_XY:
                 m_pCurSample->SetGravityXY(value0, value1);
 				break;
 			default:

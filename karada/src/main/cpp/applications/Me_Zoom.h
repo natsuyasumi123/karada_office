@@ -1,7 +1,7 @@
 
 
-#ifndef NDK_OPENGLES_3_0_BIGEYESSAMPLE_H
-#define NDK_OPENGLES_3_0_BIGEYESSAMPLE_H
+#ifndef NDK_OPENGLES_3_0_BIGEYESAPP_H
+#define NDK_OPENGLES_3_0_BIGEYESAPP_H
 
 
 #include <detail/type_mat.hpp>
@@ -46,4 +46,4 @@ private:
 };
 
 
-#endif //NDK_OPENGLES_3_0_BIGEYESSAMPLE_H
+#endif //NDK_OPENGLES_3_0_BIGEYESAPP_H
