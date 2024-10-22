@@ -5,6 +5,7 @@
 #include <GLUtils.h>
 #include <gtc/matrix_transform.hpp>
 #include "ASHI_Lengthen.h"
+#include "MyGLRenderContext.h"
 
 #define VERTEX_POS_INDX  0
 #define TEXTURE_POS_INDX 1
@@ -78,8 +79,6 @@ ASHI_Lengthen::ASHI_Lengthen()
 	m_FboSamplerLoc = GL_NONE;
 
 	m_dt = 0.0;
-	m_isgo = true;
-
 	m_StretchMode = VERTICAL_STRETCH_8_POINTS;
 }
 
@@ -100,78 +99,49 @@ void ASHI_Lengthen::LoadImage(NativeImage *pImage)
 	}
 }
 
+void ASHI_Lengthen::initAshiData() {
+
+    std::vector<float> ashiData(5 * 3 ) ;
+    bool ret = MyGLRenderContext::GetInstance()->getKaradaData(0 , 6 ,ashiData);
+
+    RectF inRectF;
+    if(ret){
+        inRectF.left = 0 ;
+        inRectF.right = m_RenderImage.width ;
+        inRectF.top = ashiData[ 0 * 3 + 1 ];
+        inRectF.bottom = ashiData[1 *3 +1];
+    }
+
+    m_StretchRect.left = inRectF.left / m_RenderImage.width;
+    m_StretchRect.right = inRectF.right / m_RenderImage.width;
+    m_StretchRect.top = inRectF.top / m_RenderImage.height;
+    m_StretchRect.bottom = inRectF.bottom / m_RenderImage.height;
+}
+
 void ASHI_Lengthen::Init()
 {
-	m_bIsVerticalMode = true;
 
-	RectF inRectF;
-	inRectF.left =m_RenderImage.width/4 ;
-	inRectF.right = m_RenderImage.width *3 / 4;
-	inRectF.top = m_RenderImage.height  /4;
-	inRectF.bottom = m_RenderImage.height * 3/ 4;
 
-	m_StretchRect.left = inRectF.left / m_RenderImage.width;
-	m_StretchRect.right = inRectF.right / m_RenderImage.width;
-	m_StretchRect.top = inRectF.top / m_RenderImage.height;
-	m_StretchRect.bottom = inRectF.bottom / m_RenderImage.height;
+    initAshiData() ;
 
-	if (m_bIsVerticalMode)
-	{
-		if (m_StretchRect.top == 0 && m_StretchRect.bottom == 1.0f)
-		{
-			m_StretchMode = VERTICAL_STRETCH_4_POINTS;
-		}
-		else if (m_StretchRect.top == 0.0f)
-		{
-			m_StretchMode = VERTICAL_STRETCH_TOP_6_POINTS;
-		}
-		else if (m_StretchRect.bottom == 1.0f)
-		{
-			m_StretchMode = VERTICAL_STRETCH_BOTTOM_6_POINTS;
-		}
-		else
-		{
-			m_StretchMode = VERTICAL_STRETCH_8_POINTS ;
-		}
-	}
-	else
-	{
-		if (m_StretchRect.left == 0 && m_StretchRect.right == 1.0f)
-		{
-			m_StretchMode = HORIZONTAL_STRETCH_4_POINTS;
-		}
-		else if (m_StretchRect.left == 0.0f)
-		{
-			m_StretchMode = HORIZONTAL_STRETCH_LEFT_6_POINTS;
-		}
-		else if (m_StretchRect.right == 1.0f)
-		{
-			m_StretchMode = HORIZONTAL_STRETCH_RIGHT_6_POINTS;
-		}
-		else
-		{
-			m_StretchMode = HORIZONTAL_STRETCH_8_POINTS;
-		}
-	}
+    if (m_StretchRect.top == 0 && m_StretchRect.bottom == 1.0f)
+    {
+        m_StretchMode = VERTICAL_STRETCH_4_POINTS;
+    }
+    else if (m_StretchRect.top == 0.0f)
+    {
+        m_StretchMode = VERTICAL_STRETCH_TOP_6_POINTS;
+    }
+    else if (m_StretchRect.bottom == 1.0f)
+    {
+        m_StretchMode = VERTICAL_STRETCH_BOTTOM_6_POINTS;
+    }
+    else
+    {
+        m_StretchMode = VERTICAL_STRETCH_8_POINTS ;
+    }
 
-	if (m_dt <= -0.2)
-	{
-		m_isgo = true;
-	}
-
-	if (m_dt >= 0.2)
-	{
-		m_isgo = false;
-	}
-
-	if (m_isgo)
-	{
-		m_dt += 0.01;
-	}
-	else
-	{
-		m_dt -= 0.01;
-	}
+    m_dt = degree /3   ;
 
 	float y1 = 1 - 2 * m_StretchRect.top;
 	float y2 = 1 - 2 * m_StretchRect.bottom;
@@ -197,19 +167,7 @@ void ASHI_Lengthen::Init()
 			 0.8f * wbl,   0.8f* hbl + m_dt*0.8f, 0.0f,
 	};
 
-	/**horizontal 顶点坐标*/
-	GLfloat vHVertices[] = {
-			-0.8f * wbl  - m_dt*0.8f,   0.8f* hbl, 0.0f,
-			-0.8f * wbl  - m_dt*0.8f,  -0.8f* hbl, 0.0f,
-			 0.8f * wbl  + m_dt*0.8f,  -0.8f* hbl, 0.0f,
-			 0.8f * wbl  + m_dt*0.8f,   0.8f* hbl, 0.0f,
-	};
-//	GLfloat vHVertices[] = {
-//			-0.8f   - m_dt*0.8f,   0.8f, 0.0f,
-//			-0.8f   - m_dt*0.8f,  -0.8f, 0.0f,
-//			0.8f  + m_dt*0.8f,  -0.8f, 0.0f,
-//			0.8f  + m_dt*0.8f,   0.8f, 0.0f,
-//	};
+
 
 	//正常纹理坐标
 	GLfloat vTexCoors[] = {
@@ -382,18 +340,9 @@ void ASHI_Lengthen::Init()
 
 
 	if(m_FboProgramObj) {
-		if (m_bIsVerticalMode)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vVertices), vVertices);
-		}
-		else
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vHVertices), vHVertices);
-		}
 
-
+        glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vVertices), vVertices);
 		switch (m_StretchMode)
 		{
 			case VERTICAL_STRETCH_8_POINTS:
@@ -468,17 +417,9 @@ void ASHI_Lengthen::Init()
 		glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
 		glBindTexture(GL_TEXTURE_2D, m_FboTextureId);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FboTextureId, 0);
-		if (m_bIsVerticalMode)
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width,
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width,
 						 static_cast<GLsizei>(m_RenderImage.height * (1 + 2*m_dt)), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		}
-		else
-		{
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
-						 static_cast<GLsizei>(m_RenderImage.width * (1 + 2 * m_dt)),
-						 m_RenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		}
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER)!= GL_FRAMEBUFFER_COMPLETE) {
 			LOGCATE("ASHI_Lengthen::Init glCheckFramebufferStatus status != GL_FRAMEBUFFER_COMPLETE");
@@ -533,20 +474,9 @@ void ASHI_Lengthen::Init()
 	m_MVPMatLoc = glGetUniformLocation(m_ProgramObj, "u_MVPMatrix");
 	m_FboMVPMatLoc = glGetUniformLocation(m_FboProgramObj, "u_MVPMatrix");
 
-	// Generate VBO Ids and load the VBOs with data
-	if (m_bIsVerticalMode)
-	{
-		glGenBuffers(6, m_VboIds);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vVertices), vVertices, GL_DYNAMIC_DRAW);
-	}
-	else
-	{
-		glGenBuffers(6, m_VboIds);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vHVertices), vHVertices, GL_DYNAMIC_DRAW);
-	}
-
+    glGenBuffers(6, m_VboIds);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vVertices), vVertices, GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vTexCoors), vTexCoors, GL_STATIC_DRAW);
@@ -696,19 +626,9 @@ void ASHI_Lengthen::Init()
 
 void ASHI_Lengthen::Draw(int screenW, int screenH)
 {
-	LOGCATE("ASHI_Lengthen::Draw [screenW, screenH] = [%d, %d]", screenW, screenH);
-	//纹理就是一个“可以被采样的复杂的数据集合” 纹理作为 GPU 图像数据结构
-	//glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-	if (m_bIsVerticalMode)
-	{
-		glViewport(0, 0, static_cast<GLsizei>(m_RenderImage.width),
-				   static_cast<GLsizei>(m_RenderImage.height*(1+2*m_dt)));
-	}
-	else
-	{
-		glViewport(0, 0, static_cast<GLsizei>(m_RenderImage.width*(1+2*m_dt)),
-				   static_cast<GLsizei>(m_RenderImage.height));
-	}
+
+    glViewport(0, 0, static_cast<GLsizei>(m_RenderImage.width),
+               static_cast<GLsizei>(m_RenderImage.height*(1+2*m_dt)));
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	// Do FBO off screen rendering

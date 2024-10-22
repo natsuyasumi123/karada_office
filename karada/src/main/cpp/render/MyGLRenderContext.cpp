@@ -178,7 +178,10 @@ void MyGLRenderContext::setDegree(float degree){
             break ;
         }
         case 6 :{ //ashi
-
+            kData[0 *3 + 0 ] = 0 ;
+            kData[0 *3 + 1] = (karadaData[index][23 *3 +1] /2 +  karadaData[index][24 *3 +1] /2 ) * imageHeight;
+            kData[1 *3 + 0] = 0;
+            kData[1 *3 + 1] = (karadaData[index][27 *3 +1] /2 +  karadaData[index][28 *3 +1] /2 ) * imageHeight;
         }
         }
 	}

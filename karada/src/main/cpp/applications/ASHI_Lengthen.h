@@ -36,6 +36,8 @@ public:
 
 	bool CreateFrameBufferObj();
 
+    void initAshiData() ;
+
 private:
 	GLuint m_ImageTextureId;
 	GLuint m_FboTextureId;
@@ -56,12 +58,13 @@ private:
 	GLint m_MVPMatLoc;
 
 	GLfloat m_dt;
-	bool    m_isgo;
 
 	RectF m_StretchRect;
 	int   m_StretchMode;
 
-	bool  m_bIsVerticalMode;
+
+
+
 };
 
 
