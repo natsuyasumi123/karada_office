@@ -55,8 +55,8 @@ public:
 
 private:
 	static MyGLRenderContext *m_pContext;
-	AppBase *m_pBeforeSample;
-	AppBase *m_pCurSample;
+	AppBase *m_preApp;
+	AppBase *m_curApp;
 	int m_ScreenW = 0 ;
 	int m_ScreenH = 0 ;
     int imageWidth = 0 ;

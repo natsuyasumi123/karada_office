@@ -87,7 +87,10 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
             "脸KAO SLENDER",
             "髋HIPPU ADJUST",
             "腹NAKA TRIM" ,
-            "腿ASHI LENGTHEN"
+            "腿ASHI LENGTHEN",
+            "腿ASHI THIN" ,
+            "手A-MU THIN",
+            "肌HADA SMOOTHEN"
     };
 
     private MyGLSurfaceView mGLSurfaceView;
@@ -205,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                         bitmap.copyPixelsToBuffer(buf);
                         byte[] byteArray = buf.array();
                         mGLRender.setParamsInt(TYPE_BASE, mSampleSelectedIndex + TYPE_BASE, 0);
+                        saveToTxt(landMarks[0] , "test.txt");
                         mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray , landMarks , faceMarks);//设置图片
                     }
                     if (mask != null) {

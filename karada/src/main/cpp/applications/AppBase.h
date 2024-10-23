@@ -20,6 +20,8 @@
 #define TYPE_HIPPU_ADJUST                TYPE_BASE + 4
 #define TYPE_NAKA_TRIM                   TYPE_BASE + 5
 #define TYPE_ASHI_LENGTHEN               TYPE_BASE + 6
+#define TYPE_ASHI_THIN                   TYPE_BASE + 7
+#define TYPE_A_MU_THIN                   TYPE_BASE + 8
 
 #define TYPE_KEY_SET_TOUCH_LOC           TYPE_BASE + 999
 #define TYPE_SET_GRAVITY_XY              TYPE_BASE + 1000

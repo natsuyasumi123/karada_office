@@ -1,7 +1,7 @@
+#include <cmath>
 
-
-#include <KOSHI_Slim.h>
-#include <MUNE_Burst.h>
+#include "KOSHI_Slim.h"
+#include "MUNE_Burst.h"
 #include "MyGLRenderContext.h"
 #include "LogUtil.h"
 #include "Me_Zoom.h"
@@ -9,27 +9,29 @@
 #include "HIPPU_Adjust.h"
 #include "NAKA_Trim.h"
 #include "ASHI_Lengthen.h"
+#include "ASHI_Thin.h"
+#include "A_MU_Thin.h"
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
 MyGLRenderContext::MyGLRenderContext()
 {
-	m_pCurSample = new KOSHI_Slim();
-	m_pBeforeSample = nullptr;
+    m_curApp = new KOSHI_Slim();
+    m_preApp = nullptr;
 }
 
 MyGLRenderContext::~MyGLRenderContext()
 {
-	if (m_pCurSample)
+	if (m_curApp)
 	{
-		delete m_pCurSample;
-		m_pCurSample = nullptr;
+		delete m_curApp;
+        m_curApp = nullptr;
 	}
 
-	if (m_pBeforeSample)
+	if (m_preApp)
 	{
-		delete m_pBeforeSample;
-		m_pBeforeSample = nullptr;
+		delete m_preApp;
+        m_preApp = nullptr;
 	}
 
 }
@@ -41,33 +43,39 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
 
 	if (paramType == TYPE_BASE)
 	{
-		m_pBeforeSample = m_pCurSample;
-		LOGCATE("MyGLRenderContext::SetParamsInt 0 m_pBeforeSample = %p", m_pBeforeSample);
+        m_preApp = m_curApp;
+		LOGCATE("MyGLRenderContext::SetParamsInt 0 m_preApp = %p", m_preApp);
 		switch (value0)
 		{
             case TYPE_KEY_BIG_EYES:
-                m_pCurSample = new Me_Zoom();
+                m_curApp = new Me_Zoom();
                 break;
 			case TYPE_KEY_shrink_koshi:
-				m_pCurSample = new KOSHI_Slim();
+                m_curApp = new KOSHI_Slim();
 				break;
 			case TYPE_KEY_BIG_BREAST:
-				m_pCurSample = new MUNE_Burst() ;
+                m_curApp = new MUNE_Burst() ;
 				break ;
 			case TYPE_KEY_FACE_SLENDER:
-				m_pCurSample = new KAO_Slender();
+                m_curApp = new KAO_Slender();
 				break;
             case TYPE_HIPPU_ADJUST :
-                m_pCurSample = new HIPPU_Adjust() ;
+                m_curApp = new HIPPU_Adjust() ;
                 break;
             case TYPE_NAKA_TRIM:
-                m_pCurSample = new NAKA_Trim() ;
+                m_curApp = new NAKA_Trim() ;
                 break ;
             case TYPE_ASHI_LENGTHEN:
-                m_pCurSample = new ASHI_Lengthen() ;
+                m_curApp = new ASHI_Lengthen() ;
+                break ;
+            case TYPE_ASHI_THIN :
+                m_curApp = new ASHI_Thin();
+                break ;
+            case TYPE_A_MU_THIN :
+                m_curApp = new A_MU_Thin() ;
                 break ;
 			default:
-			    m_pCurSample = nullptr;
+                m_curApp = nullptr;
 				break;
 		}
 	}
@@ -90,9 +98,9 @@ void MyGLRenderContext::setFaceData(float *fData,int index,  int length) {
 
 
 void MyGLRenderContext::setDegree(float degree){
-    if(m_pCurSample)
+    if(m_curApp)
     {
-        m_pCurSample->degree = degree ;
+        m_curApp->degree = degree ;
     }
 }
 
@@ -159,7 +167,7 @@ void MyGLRenderContext::setDegree(float degree){
             kData[1 *3 + 1] =(karadaData[index][25 *3 + 1 ] /2 +karadaData[index][26 *3 + 1] /2)  * imageHeight ;
             kData[2*3 +0] =karadaData[index][23 *3 ] * imageWidth  ;
             kData[2*3 +1] =karadaData[index][23 *3 +1] * imageHeight ;
-            int hippuWidth = (karadaData[index][23 * 3 ] - karadaData[index][24 *3 ]) * imageWidth ;
+            int hippuWidth = std::abs(karadaData[index][23 * 3 ] - karadaData[index][24 *3 ]) * imageWidth ;
             kData[3 *3 + 0] = karadaData[index][24 *3  ] * imageWidth - hippuWidth /3;
             kData[3 *3 + 1] = karadaData[index] [24 *3  + 1 ] * imageHeight ;
             kData[4*3 +0] =karadaData[index][23 *3 ] * imageWidth + hippuWidth /3  ;
@@ -177,12 +185,148 @@ void MyGLRenderContext::setDegree(float degree){
             kData[2 *3 + 1] =  std::abs(karadaData[index][23 *3 ] - karadaData[index][24 *3 ] ) *imageWidth ;
             break ;
         }
-        case 6 :{ //ashi
+        case 6 :{ //ashi 长腿
             kData[0 *3 + 0 ] = 0 ;
             kData[0 *3 + 1] = (karadaData[index][23 *3 +1] /2 +  karadaData[index][24 *3 +1] /2 ) * imageHeight;
             kData[1 *3 + 0] = 0;
             kData[1 *3 + 1] = (karadaData[index][27 *3 +1] /2 +  karadaData[index][28 *3 +1] /2 ) * imageHeight;
+            break ;
         }
+        case 7 :{ // legs
+            //   LeftCheekKeyPoint[0] = kaoData[0 *3];//左脸颊关键点
+            //          LeftCheekKeyPoint[1] =  kaoData[0 *3 + 1];//左脸颊关键点
+            //          ChinKeyPoint[0] = kaoData[1 *3 ];//下巴关键点
+            //          ChinKeyPoint[1] = kaoData[1 *3 +1];//下巴关键点
+            //          RightCheekPoint[0] = kaoData[2 *3 ];//右脸颊关键点
+            //          RightCheekPoint[1] = kaoData[2 *3 +1];//右脸颊关键点
+            //          LeftSlenderCtlPoint[0] = kaoData[3 *3 ];//左侧控制点
+            //          LeftSlenderCtlPoint[1] = kaoData[3 *3 +1];//左侧控制点
+            //          RightSlenderCtlPoint[0] = kaoData[4 *3 ];//右侧控制点
+            //          RightSlenderCtlPoint[1] = kaoData[4 *3 + 1];//右侧控制点
+            kData[1 *3 + 0] =karadaData[index][14 *3 ]  * imageWidth  -60;
+            kData[1 *3 + 1] =karadaData[index][14 *3 +1]  * imageHeight +80;
+            kData[0 *3 + 0] =(karadaData[index][14 *3 ] *0/5 + karadaData[index][12 *3 ]*5 /5 ) * imageWidth  - 40  ;
+            kData[0 *3 + 1] =(karadaData[index][14 *3 +1 ]*0/5 + karadaData[index][12 *3  + 1]*5 /5) * imageHeight - 40 ;
+            kData[2*3 +0] =(karadaData[index][14 *3 ] *0/5 + karadaData[index][12 *3 ] *5 /5 ) * imageWidth + 40 ;
+            kData[2*3 +1] =(karadaData[index][14 *3 +1 ]*0/5 + karadaData[index][12 *3  + 1]*5 /5) * imageHeight + 40  ;
+            kData[3*3 +0] =(karadaData[index][14 *3 ] *4/6 + karadaData[index][12 *3 ] *2 /6 ) * imageWidth -35  ;
+            kData[3*3 +1] =(karadaData[index][14 *3 +1 ]*4/6 + karadaData[index][12 *3  + 1]* 2 /6 )  * imageHeight-35 ;
+            kData[4*3 +0] =(karadaData[index][14 *3 ] *4/6 + karadaData[index][12 *3 ] * 2 /6 ) * imageWidth  +35 ;
+            kData[4*3 +1] =(karadaData[index][14 *3 +1 ]*4/6 + karadaData[index][12 *3  + 1] *2 /6 ) * imageHeight +35 ;
+
+//            kData[5 *3 + 0] = karadaData[index][127 *3 ] * imageWidth ;
+//            kData[5 *3 + 1] = karadaData[index] [127 *3  + 1 ] * imageHeight ;
+//            kData[6 *3 + 0] =karadaData[index][152 *3 ]  * imageWidth ;
+//            kData[6 *3 + 1] =karadaData[index][152 *3 +1]  * imageHeight ;
+//            kData[7*3 +0] =karadaData[index][356 *3 ] * imageWidth ;
+//            kData[7*3 +1] =karadaData[index][356 *3 +1] * imageHeight ;
+//            kData[8*3 +0] =karadaData[index][58 *3 ] * imageWidth ;
+//            kData[8*3 +1] =karadaData[index][58 *3 +1 ]  * imageHeight ;
+//            kData[9*3 +0] =karadaData[index][367 *3 ] * imageWidth  ;
+//            kData[9*3 +1] =karadaData[index][367 *3 +1 ] * imageHeight ;
+//
+//            kData[10 *3 + 0] = karadaData[index][127 *3 ] * imageWidth ;
+//            kData[10 *3 + 1] = karadaData[index] [127 *3  + 1 ] * imageHeight ;
+//            kData[11 *3 + 0] =karadaData[index][152 *3 ]  * imageWidth ;
+//            kData[11 *3 + 1] =karadaData[index][152 *3 +1]  * imageHeight ;
+//            kData[12*3 +0] =karadaData[index][356 *3 ] * imageWidth ;
+//            kData[12*3 +1] =karadaData[index][356 *3 +1] * imageHeight ;
+//            kData[13*3 +0] =karadaData[index][58 *3 ] * imageWidth ;
+//            kData[13*3 +1] =karadaData[index][58 *3 +1 ]  * imageHeight ;
+//            kData[14*3 +0] =karadaData[index][367 *3 ] * imageWidth  ;
+//            kData[14*3 +1] =karadaData[index][367 *3 +1 ] * imageHeight ;
+//
+//            kData[15 *3 + 0] = karadaData[index][127 *3 ] * imageWidth ;
+//            kData[15 *3 + 1] = karadaData[index] [127 *3  + 1 ] * imageHeight ;
+//            kData[16 *3 + 0] =karadaData[index][152 *3 ]  * imageWidth ;
+//            kData[16 *3 + 1] =karadaData[index][152 *3 +1]  * imageHeight ;
+//            kData[17*3 +0] =karadaData[index][356 *3 ] * imageWidth ;
+//            kData[17*3 +1] =karadaData[index][356 *3 +1] * imageHeight ;
+//            kData[18*3 +0] =karadaData[index][58 *3 ] * imageWidth ;
+//            kData[18*3 +1] =karadaData[index][58 *3 +1 ]  * imageHeight ;
+//            kData[19*3 +0] =karadaData[index][367 *3 ] * imageWidth  ;
+//            kData[19*3 +1] =karadaData[index][367 *3 +1 ] * imageHeight ;
+
+break ;
+        }
+        case 8 :{//arms
+            //   LeftCheekKeyPoint[0] = kaoData[0 *3];//左脸颊关键点
+            //          LeftCheekKeyPoint[1] =  kaoData[0 *3 + 1];//左脸颊关键点
+            //          ChinKeyPoint[0] = kaoData[1 *3 ];//下巴关键点
+            //          ChinKeyPoint[1] = kaoData[1 *3 +1];//下巴关键点
+            //          RightCheekPoint[0] = kaoData[2 *3 ];//右脸颊关键点
+            //          RightCheekPoint[1] = kaoData[2 *3 +1];//右脸颊关键点
+            //          LeftSlenderCtlPoint[0] = kaoData[3 *3 ];//左侧控制点
+            //          LeftSlenderCtlPoint[1] = kaoData[3 *3 +1];//左侧控制点
+            //          RightSlenderCtlPoint[0] = kaoData[4 *3 ];//右侧控制点
+            //          RightSlenderCtlPoint[1] = kaoData[4 *3 + 1];//右侧控制点
+
+            float leftArm0Size[2] ={std::abs(karadaData[index][12 * 3 ] - karadaData[index][14 * 3 ] ) * imageWidth
+                                    ,std::abs(karadaData[index][12 * 3 +1] - karadaData[index][14 * 3 +1 ] ) * imageHeight  } ;//左上臂x y
+            float leftArm1Size[2] ={std::abs(karadaData[index][16 * 3 ] - karadaData[index][14 * 3 ] ) * imageWidth
+                                    ,std::abs(karadaData[index][16 * 3 +1] - karadaData[index][14 * 3 +1 ] ) * imageHeight } ;//左前臂 x y
+            float rightArm0Size[2] ={std::abs(karadaData[index][11 * 3 ] - karadaData[index][13 * 3 ] ) * imageWidth
+                                    ,std::abs(karadaData[index][11 * 3 +1] - karadaData[index][13 * 3 +1 ] ) * imageHeight} ;//右上臂 x y
+            float rightArm1Size[2] ={std::abs(karadaData[index][15 * 3 ] - karadaData[index][13 * 3 ] ) * imageWidth
+                                    ,std::abs(karadaData[index][15 * 3 +1] - karadaData[index][13 * 3 +1 ] ) * imageHeight} ;//右前臂 x y
+            float leftArm0Length =  sqrt(leftArm0Size[0] * leftArm0Size[0]  + leftArm0Size[1] * leftArm0Size[1]) ;
+            float leftArm1Length =  sqrt(leftArm1Size[0] * leftArm1Size[0]  + leftArm1Size[1] * leftArm1Size[1]) ;
+            float rightArm0Length =  sqrt(rightArm0Size[0] * rightArm0Size[0]  + rightArm0Size[1] * rightArm0Size[1]) ;
+            float rightArm1Length =  sqrt(rightArm1Size[0] * rightArm1Size[0]  + rightArm1Size[1] * rightArm1Size[1]) ;
+
+            float leftArmLength = std::max(leftArm0Length , leftArm1Length);
+            float rightArmLength = std::max(rightArm0Length , rightArm1Length) ;
+
+            float leftArm0Width = leftArmLength / 3 ; //左上臂宽
+            float leftArm1Width = leftArmLength / 4 ; //左前臂宽
+            float rightArm0Width = rightArmLength /3 ; //右上臂宽
+            float rightArm1Width = rightArmLength /4 ; //右前臂宽
+
+            kData[0 *3 + 0] = (karadaData[index][14 *3 ] *0/5 + karadaData[index][12 *3 ]*5 /5 ) * imageWidth  - leftArm0Width /2   ;
+            kData[0 *3 + 1] =(karadaData[index][14 *3 +1 ]*0/5 + karadaData[index][12 *3  + 1]*5 /5) * imageHeight - leftArm0Width /2 ;
+            kData[1 *3 + 0] =karadaData[index][14 *3 ]  * imageWidth  -leftArm0Width;
+            kData[1 *3 + 1] =karadaData[index][14 *3 +1]  * imageHeight +leftArm0Width;
+            kData[2*3 +0] =(karadaData[index][14 *3 ] *0/5 + karadaData[index][12 *3 ] *5 /5 ) * imageWidth + leftArm0Width /2;
+            kData[2*3 +1] =(karadaData[index][14 *3 +1 ]*0/5 + karadaData[index][12 *3  + 1]*5 /5) * imageHeight + leftArm0Width /2  ;
+            kData[3*3 +0] =(karadaData[index][14 *3 ] *4/6 + karadaData[index][12 *3 ] *2 /6 ) * imageWidth -leftArm1Width /2  ;
+            kData[3*3 +1] =(karadaData[index][14 *3 +1 ]*4/6 + karadaData[index][12 *3  + 1]* 2 /6 )  * imageHeight-leftArm1Width /2  ;
+            kData[4*3 +0] =(karadaData[index][14 *3 ] *4/6 + karadaData[index][12 *3 ] * 2 /6 ) * imageWidth  +leftArm1Width /2 ;
+            kData[4*3 +1] =(karadaData[index][14 *3 +1 ]*4/6 + karadaData[index][12 *3  + 1] *2 /6 ) * imageHeight +leftArm1Width /2 ;
+
+//            kData[5 *3 + 0] = karadaData[index][127 *3 ] * imageWidth ;
+//            kData[5 *3 + 1] = karadaData[index] [127 *3  + 1 ] * imageHeight ;
+//            kData[6 *3 + 0] =karadaData[index][152 *3 ]  * imageWidth ;
+//            kData[6 *3 + 1] =karadaData[index][152 *3 +1]  * imageHeight ;
+//            kData[7*3 +0] =karadaData[index][356 *3 ] * imageWidth ;
+//            kData[7*3 +1] =karadaData[index][356 *3 +1] * imageHeight ;
+//            kData[8*3 +0] =karadaData[index][58 *3 ] * imageWidth ;
+//            kData[8*3 +1] =karadaData[index][58 *3 +1 ]  * imageHeight ;
+//            kData[9*3 +0] =karadaData[index][367 *3 ] * imageWidth  ;
+//            kData[9*3 +1] =karadaData[index][367 *3 +1 ] * imageHeight ;
+//
+//            kData[10 *3 + 0] = karadaData[index][127 *3 ] * imageWidth ;
+//            kData[10 *3 + 1] = karadaData[index] [127 *3  + 1 ] * imageHeight ;
+//            kData[11 *3 + 0] =karadaData[index][152 *3 ]  * imageWidth ;
+//            kData[11 *3 + 1] =karadaData[index][152 *3 +1]  * imageHeight ;
+//            kData[12*3 +0] =karadaData[index][356 *3 ] * imageWidth ;
+//            kData[12*3 +1] =karadaData[index][356 *3 +1] * imageHeight ;
+//            kData[13*3 +0] =karadaData[index][58 *3 ] * imageWidth ;
+//            kData[13*3 +1] =karadaData[index][58 *3 +1 ]  * imageHeight ;
+//            kData[14*3 +0] =karadaData[index][367 *3 ] * imageWidth  ;
+//            kData[14*3 +1] =karadaData[index][367 *3 +1 ] * imageHeight ;
+//
+//            kData[15 *3 + 0] = karadaData[index][127 *3 ] * imageWidth ;
+//            kData[15 *3 + 1] = karadaData[index] [127 *3  + 1 ] * imageHeight ;
+//            kData[16 *3 + 0] =karadaData[index][152 *3 ]  * imageWidth ;
+//            kData[16 *3 + 1] =karadaData[index][152 *3 +1]  * imageHeight ;
+//            kData[17*3 +0] =karadaData[index][356 *3 ] * imageWidth ;
+//            kData[17*3 +1] =karadaData[index][356 *3 +1] * imageHeight ;
+//            kData[18*3 +0] =karadaData[index][58 *3 ] * imageWidth ;
+//            kData[18*3 +1] =karadaData[index][58 *3 +1 ]  * imageHeight ;
+//            kData[19*3 +0] =karadaData[index][367 *3 ] * imageWidth  ;
+//            kData[19*3 +1] =karadaData[index][367 *3 +1 ] * imageHeight ;
+        }
+
         }
 	}
     return true;
@@ -191,15 +335,15 @@ void MyGLRenderContext::setDegree(float degree){
 
 void MyGLRenderContext::SetParamsFloat(int paramType, float value0, float value1) {
 	LOGCATE("MyGLRenderContext::SetParamsFloat paramType=%d, value0=%f, value1=%f", paramType, value0, value1);
-	if(m_pCurSample)
+	if(m_curApp)
 	{
 		switch (paramType)
 		{
 			case TYPE_KEY_SET_TOUCH_LOC:
-				m_pCurSample->SetTouchLocation(value0, value1);
+				m_curApp->SetTouchLocation(value0, value1);
 				break;
 			case TYPE_SET_GRAVITY_XY:
-                m_pCurSample->SetGravityXY(value0, value1);
+                m_curApp->SetGravityXY(value0, value1);
 				break;
 			default:
 				break;
@@ -211,9 +355,9 @@ void MyGLRenderContext::SetParamsFloat(int paramType, float value0, float value1
 
 void MyGLRenderContext::SetParamsShortArr(short *const pShortArr, int arrSize) {
 	LOGCATE("MyGLRenderContext::SetParamsShortArr pShortArr=%p, arrSize=%d, pShortArr[0]=%d", pShortArr, arrSize, pShortArr[0]);
-	if(m_pCurSample)
+	if(m_curApp)
 	{
-		m_pCurSample->LoadShortArrData(pShortArr, arrSize);
+		m_curApp->LoadShortArrData(pShortArr, arrSize);
 	}
 
 }
@@ -221,9 +365,9 @@ void MyGLRenderContext::SetParamsShortArr(short *const pShortArr, int arrSize) {
 void MyGLRenderContext::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY)
 {
 	LOGCATE("MyGLRenderContext::UpdateTransformMatrix [rotateX, rotateY, scaleX, scaleY] = [%f, %f, %f, %f]", rotateX, rotateY, scaleX, scaleY);
-	if (m_pCurSample)
+	if (m_curApp)
 	{
-		m_pCurSample->UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
+		m_curApp->UpdateTransformMatrix(rotateX, rotateY, scaleX, scaleY);
 	}
 }
 
@@ -253,9 +397,9 @@ void MyGLRenderContext::SetImageDataWithIndex(int index, int format, int width, 
 			break;
 	}
 
-	if (m_pCurSample)
+	if (m_curApp)
 	{
-		m_pCurSample->LoadMultiImageWithIndex(index, &nativeImage);
+		m_curApp->LoadMultiImageWithIndex(index, &nativeImage);
 	}
 
 }
@@ -285,9 +429,9 @@ void MyGLRenderContext::SetImageData(int format, int width, int height, uint8_t 
 			break;
 	}
 
-	if (m_pCurSample)
+	if (m_curApp)
 	{
-		m_pCurSample->LoadImage(&nativeImage);
+		m_curApp->LoadImage(&nativeImage);
 	}
 
 }
@@ -314,9 +458,9 @@ void MyGLRenderContext::SetOutlineData(int format, int width, int height, uint8_
             break;
     }
 
-//    if (m_pCurSample)
+//    if (m_curApp)
 //    {
-//        m_pCurSample->LoadImage(&nativeImage);
+//        m_curApp->LoadImage(&nativeImage);
 //    }
 
 }
@@ -340,17 +484,17 @@ void MyGLRenderContext::OnDrawFrame()
 	LOGCATE("MyGLRenderContext::OnDrawFrame");
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	if (m_pBeforeSample)
+	if (m_preApp)
 	{
-		m_pBeforeSample->Destroy();
-		delete m_pBeforeSample;
-		m_pBeforeSample = nullptr;
+		m_preApp->Destroy();
+		delete m_preApp;
+        m_preApp = nullptr;
 	}
 
-	if (m_pCurSample)
+	if (m_curApp)
 	{
-		m_pCurSample->Init();
-		m_pCurSample->Draw(m_ScreenW, m_ScreenH);
+		m_curApp->Init();
+		m_curApp->Draw(m_ScreenW, m_ScreenH);
 	}
 }
 
