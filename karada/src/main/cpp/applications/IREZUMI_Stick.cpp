@@ -212,6 +212,12 @@ void IREZUMI_Stick::addSticker(std::string path )  {
     this->stickerPath = path ;
 }
 
+void IREZUMI_Stick::setStickerVertices(float * v , int size )  {
+    for(int index = 0 ; index < size ; index ++ ){
+        vertices[index] = v[index] ;
+    }
+}
+
 void IREZUMI_Stick::initHippuData() {
      //no need yet
 }
@@ -292,10 +298,11 @@ void IREZUMI_Stick::Draw(int screenW, int screenH)
     //            "uniform vec2 bottomRight;//value0:100;value1:100;restrict:false;is_uvs:0\n"
     float ratio = degree * 30 ;
 //    GLUtils::setVec2(m_ProgramObj, "viewPort", m_RenderImage.width, m_RenderImage.height);
-    GLUtils::setVec2(m_ProgramObj, "topLeft", 0.5f, 0.25f);
-    GLUtils::setVec2(m_ProgramObj, "topRight", 0.75f, 0.25f);
-    GLUtils::setVec2(m_ProgramObj, "bottomLeft", 0.5f, 0.75f);
-    GLUtils::setVec2(m_ProgramObj, "bottomRight", 0.75f, 0.75f);
+    GLUtils::setVec2(m_ProgramObj, "topLeft", vertices[0], vertices[1]);
+    GLUtils::setVec2(m_ProgramObj, "topRight", vertices[2], vertices[3]);
+    GLUtils::setVec2(m_ProgramObj, "bottomLeft", vertices[6], vertices[7]);
+    GLUtils::setVec2(m_ProgramObj, "bottomRight", vertices[4], vertices[5]);
+
     GLUtils::setVec2(m_ProgramObj, "viewPort", screenW, screenH);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void *)0);

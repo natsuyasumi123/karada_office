@@ -55,6 +55,7 @@ public:
     void getImageSize(int & width , int & height) ;
 
     void addSticker(std::string stickerPath) ;
+    void setStickerVertices(float* vertices , int length) ;
 
 private:
 	static MyGLRenderContext *m_pContext;

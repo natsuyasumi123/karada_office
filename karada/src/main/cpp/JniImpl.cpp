@@ -280,6 +280,23 @@ extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1a
     MyGLRenderContext::GetInstance()->addSticker(imagePath);
 }
 
+extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1setStickerVertices(
+        JNIEnv *env, jobject obj ,
+        jfloatArray vertices )
+{
+    jsize length = env->GetArrayLength(vertices);
+
+    jfloat* tempArray = env->GetFloatArrayElements(vertices, NULL);
+    if (tempArray == nullptr) {
+        return;
+    }
+    float* floatArray = new float[length];  // 在堆上分配内存
+    std::memcpy(floatArray, tempArray, length * sizeof(float));  // 复制数据
+    MyGLRenderContext::GetInstance()->setStickerVertices(floatArray , length);
+    env->ReleaseFloatArrayElements(vertices, tempArray, 0);
+    delete[] floatArray;
+}
+
 static JNINativeMethod g_RenderMethods[] = {
 		{"native_Init",                      "()V",       (void *)(native_Init)},
 //		{"native_SetMarkData",              "()V",       (void *)(native_SetMarkData)},

@@ -29,6 +29,7 @@ public:
     void initHippuData();
 
     void addSticker(std::string path) override ;
+    void setStickerVertices(float* vertices , int size) override ;
 
 private:
 	GLuint m_TextureId;
@@ -48,7 +49,7 @@ private:
 
 	int m_FrameIndex;
     std::string stickerPath ;
- 
+    float vertices[8] = {};
 
 };
 

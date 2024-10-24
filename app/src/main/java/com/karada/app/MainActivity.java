@@ -71,7 +71,7 @@ import static com.enjoy.karada.MyGLSurfaceView.* ;
 import static com.enjoy.karada.MyNativeRender.*;
 import static com.karada.app.CommonUtils.saveBitmapToFile;
 
-public class MainActivity extends AppCompatActivity implements ViewTreeObserver.OnGlobalLayoutListener {
+public class MainActivity extends AppCompatActivity implements ViewTreeObserver.OnGlobalLayoutListener , DraggableQuadView.VertexListener {
     private static final String TAG = "MainActivity";
     private static final String[] REQUEST_PERMISSIONS = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
     private String showFilePath = "" ;
     private Uri selectedUri =null ;
 
-
+    private DraggableQuadView dqView ;
 //
 
     @Override
@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         setContentView(R.layout.activity_main);
         mRootView = findViewById(R.id.rootView);
         seekBar = findViewById(R.id.seekBar) ;
+        dqView = findViewById(R.id.dqView) ;
         mRootView.getViewTreeObserver().addOnGlobalLayoutListener(this);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mGLRender.init();
@@ -127,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         createImageSegmenter();
     }
 
+    float  initPoints[]
+            = {270 , 600 , 810 ,600 , 810 , 1400, 270 ,1400 } ;
 
     @Override
     public void onGlobalLayout() {
@@ -137,7 +140,8 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         mGLSurfaceView = new MyGLSurfaceView(this, mGLRender);
         mGLSurfaceView.setRenderMode(RENDERMODE_CONTINUOUSLY);
         mRootView.addView(mGLSurfaceView, lp);
-
+        dqView.setInitPoints(initPoints);
+        dqView.setVertextListener(this);
         CommonUtils.copyAssetsDirToSDCard(this,"image" ,defaultPath   ) ;
         //showFilePath = defaultPath + "image/test.PNG" ;
         showFilePath = defaultPath + "image/e.jpg" ;
@@ -163,7 +167,11 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         });
     }
 
-
+    @Override
+    public void onDragged(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+        float array[] = {x1 , y1 , x2 , y2 , x3 , y3 , x4 ,y4};
+        mGLRender.setStickerVertices(array);
+    }
 
 
     interface DetectCallback{

@@ -71,6 +71,7 @@ public:
 	virtual void Destroy() = 0;
 
     virtual void addSticker(std::string path){} ;
+    virtual void setStickerVertices(float * vertices , int size){} ;
 
 protected:
 	GLuint m_VertexShader;

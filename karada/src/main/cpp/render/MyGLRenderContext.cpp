@@ -96,6 +96,12 @@ void MyGLRenderContext::addSticker(std::string stickerPath){
      }
 }
 
+void MyGLRenderContext::setStickerVertices(float* vertices , int length){
+     if(m_curApp != nullptr){
+         m_curApp->setStickerVertices(vertices , length) ;
+     }
+}
+
 
 
 void MyGLRenderContext::setKaradaData(float *kData,int index,  int length) {

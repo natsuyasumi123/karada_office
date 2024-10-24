@@ -87,4 +87,8 @@ public class MyGLRender implements GLSurfaceView.Renderer {
     public void setDegree(float degree){
         mNativeRender.native_SetDegree(degree);
     }
+
+    public void setStickerVertices(float [] vertices){
+        mNativeRender.native_setStickerVertices(vertices);
+    }
 }

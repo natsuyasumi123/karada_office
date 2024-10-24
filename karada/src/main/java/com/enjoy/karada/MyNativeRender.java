@@ -45,4 +45,5 @@ public class MyNativeRender {
     public native void native_SetDegree(float degree);
 
     public native void native_addSticker(String stickerPath) ;
+    public native void native_setStickerVertices(float [] vertices) ;
 }
