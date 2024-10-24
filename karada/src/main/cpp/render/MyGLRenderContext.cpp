@@ -1,5 +1,4 @@
 #include <cmath>
-
 #include "KOSHI_Slim.h"
 #include "MUNE_Burst.h"
 #include "MyGLRenderContext.h"
@@ -12,6 +11,7 @@
 #include "ASHI_Thin.h"
 #include "A_MU_Thin.h"
 #include "HADA_Smoothen.h"
+#include "IREZUMI_Stick.h"
 
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
@@ -79,12 +79,24 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
             case TYPE_HADA_SMOOTHEN :
                 m_curApp = new HADA_Smoothen() ;
                 break ;
+            case TYPE_IREZUMI_STICKER :
+                m_curApp = new IREZUMI_Stick() ;
+                break ;
 			default:
                 m_curApp = nullptr;
 				break;
 		}
 	}
 }
+
+
+void MyGLRenderContext::addSticker(std::string stickerPath){
+     if(m_curApp != nullptr){
+         m_curApp->addSticker(stickerPath) ;
+     }
+}
+
+
 
 void MyGLRenderContext::setKaradaData(float *kData,int index,  int length) {
     for(int i = 0 ; i < length ;i ++){

@@ -11,8 +11,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+
+
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_Init
  * Signature: ()
  */
@@ -23,7 +27,7 @@ JNIEXPORT void JNICALL native_Init(JNIEnv *env, jobject instance)
 }
 
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_UnInit
  * Signature: ()V
  */
@@ -65,7 +69,7 @@ JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1SetImageData
 }
 
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_SetImageDataWithIndex
  * Signature: (IIII[B)V
  */
@@ -81,7 +85,7 @@ JNIEXPORT void JNICALL native_SetImageDataWithIndex
 }
 
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_SetParamsInt
  * Signature: (III)V
  */
@@ -92,7 +96,7 @@ JNIEXPORT void JNICALL native_SetParamsInt
 }
 
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_SetParamsFloat
  * Signature: (IFF)V
  */
@@ -102,11 +106,8 @@ JNIEXPORT void JNICALL native_SetParamsFloat
 	MyGLRenderContext::GetInstance()->SetParamsFloat(paramType, value0, value1);
 }
 
-
-
-
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_UpdateTransformMatrix
  * Signature: (FFFF)V
  */
@@ -116,7 +117,7 @@ JNIEXPORT void JNICALL native_UpdateTransformMatrix(JNIEnv *env, jobject instanc
 }
 
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_OnSurfaceCreated
  * Signature: ()V
  */
@@ -126,7 +127,7 @@ JNIEXPORT void JNICALL native_OnSurfaceCreated(JNIEnv *env, jobject instance)
 }
 
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_OnSurfaceChanged
  * Signature: (II)V
  */
@@ -138,7 +139,7 @@ JNIEXPORT void JNICALL native_OnSurfaceChanged
 }
 
 /*
- * Class:     com_byteflow_app_MyNativeRender
+
  * Method:    native_OnDrawFrame
  * Signature: ()V
  */
@@ -151,7 +152,7 @@ JNIEXPORT void JNICALL native_OnDrawFrame(JNIEnv *env, jobject instance)
 
 
 /*
- * Class:     com_byteflow_app_egl_NativeBgRender
+
  * Method:    native_EglRenderInit
  * Signature: ()V
  */
@@ -162,7 +163,7 @@ JNIEXPORT void JNICALL native_EglRenderInit(JNIEnv *env, jobject instance)
 }
 
 /*
- * Class:     com_byteflow_app_egl_NativeBgRender
+
  * Method:    native_EglRenderSetImageData
  * Signature: ([BII)V
  */
@@ -179,7 +180,7 @@ JNIEXPORT void JNICALL native_EglRenderSetImageData(JNIEnv *env, jobject instanc
 }
 
 /*
- * Class:     com_byteflow_app_egl_NativeBgRender
+
  * Method:    native_EglRenderSetIntParams
  * Signature: (II)V
  */
@@ -190,7 +191,7 @@ JNIEXPORT void JNICALL native_EglRenderSetIntParams(JNIEnv *env, jobject instanc
 }
 
 /*
- * Class:     com_byteflow_app_egl_NativeBgRender
+
  * Method:    native_EglRenderDraw
  * Signature: ()V
  */
@@ -200,7 +201,7 @@ JNIEXPORT void JNICALL native_EglRenderDraw(JNIEnv *env, jobject instance)
 }
 
 /*
- * Class:     com_byteflow_app_egl_NativeBgRender
+
  * Method:    natuve_BgRenderUnInit
  * Signature: ()V
  */
@@ -264,6 +265,19 @@ extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1S
 {
 
     MyGLRenderContext::GetInstance()->setDegree(degree);
+}
+
+extern "C" JNIEXPORT void JNICALL Java_com_enjoy_karada_MyNativeRender_native_1addSticker(
+        JNIEnv *env, jobject obj ,
+        jstring path )
+{
+    const char* chars = env->GetStringUTFChars(path, nullptr);
+    std::string imagePath(chars);
+    env->ReleaseStringUTFChars(path, chars);
+
+
+
+    MyGLRenderContext::GetInstance()->addSticker(imagePath);
 }
 
 static JNINativeMethod g_RenderMethods[] = {

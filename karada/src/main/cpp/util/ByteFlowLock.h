@@ -54,4 +54,4 @@ private:
     MySyncLock *m_pLock;
 };
 
-#endif //NDK_OPENGLES_3_0_BYTEFLOWLOCK_H
+#endif

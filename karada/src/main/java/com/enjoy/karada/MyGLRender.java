@@ -68,6 +68,12 @@ public class MyGLRender implements GLSurfaceView.Renderer {
        // mNativeRender.native_SetOutlineData(bytes , format , width , height) ;
     }
 
+    public void addStickerByPath(String path){
+        mNativeRender.native_addSticker(path) ;
+    }
+
+
+
     /**
      * 用户手动设置一些部位的大小和位置
      * @param type 人体部位类型

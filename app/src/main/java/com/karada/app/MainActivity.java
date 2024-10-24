@@ -83,14 +83,15 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
     private static final String[] APP_TITLES = {
             "腰KOSHI SHRINK" ,
             "胸MUNE BURST ",
-            "眼ME ADJUST(unfinished)",
+            "眼ME ADJUST",
             "脸KAO SLENDER",
             "髋HIPPU ADJUST",
             "腹NAKA TRIM" ,
             "腿ASHI LENGTHEN",
             "腿ASHI THIN" ,
             "手A-MU THIN",
-            "肌HADA SMOOTHEN"
+            "肌HADA SMOOTHEN" ,
+            "纹身IREZUMI STICK"
     };
 
     private MyGLSurfaceView mGLSurfaceView;
@@ -210,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                         mGLRender.setParamsInt(TYPE_BASE, mSampleSelectedIndex + TYPE_BASE, 0);
                         saveToTxt(landMarks[0] , "test.txt");
                         mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray , landMarks , faceMarks);//设置图片
+                        if(mSampleSelectedIndex == 10){
+                           mGLRender.addStickerByPath("/sdcard/sticker.png")  ;
+                        }
                     }
                     if (mask != null) {
                         int bytes = mask.getByteCount();

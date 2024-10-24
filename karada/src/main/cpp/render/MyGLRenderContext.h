@@ -5,6 +5,7 @@
 
 #include "vector"
 #include "stdint.h"
+#include <string>
 #include <GLES3/gl3.h>
 #include "AppBase.h"
 
@@ -52,6 +53,8 @@ public:
 	static void DestroyInstance();
 
     void getImageSize(int & width , int & height) ;
+
+    void addSticker(std::string stickerPath) ;
 
 private:
 	static MyGLRenderContext *m_pContext;

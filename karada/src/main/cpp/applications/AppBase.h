@@ -4,6 +4,7 @@
 #define NDK_OPENGLES_3_0_GLAPPBASE_H
 
 #include "stdint.h"
+#include <string>
 #include <GLES3/gl3.h>
 #include <ImageDef.h>
 #include <ByteFlowLock.h>
@@ -23,6 +24,7 @@
 #define TYPE_ASHI_THIN                   TYPE_BASE + 7
 #define TYPE_A_MU_THIN                   TYPE_BASE + 8
 #define TYPE_HADA_SMOOTHEN               TYPE_BASE + 9
+#define TYPE_IREZUMI_STICKER             TYPE_BASE + 10
 #define TYPE_KEY_SET_TOUCH_LOC           TYPE_BASE + 999
 #define TYPE_SET_GRAVITY_XY              TYPE_BASE + 1000
 
@@ -67,6 +69,8 @@ public:
 	virtual void Draw(int screenW, int screenH) = 0;
 
 	virtual void Destroy() = 0;
+
+    virtual void addSticker(std::string path){} ;
 
 protected:
 	GLuint m_VertexShader;
