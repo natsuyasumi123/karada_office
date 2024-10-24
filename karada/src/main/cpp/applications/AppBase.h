@@ -22,11 +22,10 @@
 #define TYPE_ASHI_LENGTHEN               TYPE_BASE + 6
 #define TYPE_ASHI_THIN                   TYPE_BASE + 7
 #define TYPE_A_MU_THIN                   TYPE_BASE + 8
-
+#define TYPE_HADA_SMOOTHEN               TYPE_BASE + 9
 #define TYPE_KEY_SET_TOUCH_LOC           TYPE_BASE + 999
 #define TYPE_SET_GRAVITY_XY              TYPE_BASE + 1000
 
-#define DEFAULT_OGL_ASSETS_DIR "/sdcard/Android/data/com.karada.app/files/Download"
 class AppBase
 {
 public:
@@ -69,9 +68,6 @@ public:
 
 	virtual void Destroy() = 0;
 
-
-//	void setBuhinData(float *data , int size ) ;
-
 protected:
 	GLuint m_VertexShader;
 	GLuint m_FragmentShader;
@@ -79,19 +75,10 @@ protected:
 	MySyncLock m_Lock;
 	int m_SurfaceWidth;
 	int m_SurfaceHeight;
-	float mbuhinData[33 * 3 ]  = {0.0f};
-	int buhinSize ;
 public :
     float degree ;
 };
 
-
-//void AppBase::setBuhinData(float *data , int size){
-//	for(int index = 0 ; index < size ; index ++ ){
-//		mbuhinData[index] = data[index] ;
-//	}
-//	buhinSize = size ;
-//}
 
 
 

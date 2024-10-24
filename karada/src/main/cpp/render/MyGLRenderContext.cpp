@@ -11,6 +11,8 @@
 #include "ASHI_Lengthen.h"
 #include "ASHI_Thin.h"
 #include "A_MU_Thin.h"
+#include "HADA_Smoothen.h"
+
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
 
@@ -73,6 +75,9 @@ void MyGLRenderContext::SetParamsInt(int paramType, int value0, int value1)
                 break ;
             case TYPE_A_MU_THIN :
                 m_curApp = new A_MU_Thin() ;
+                break ;
+            case TYPE_HADA_SMOOTHEN :
+                m_curApp = new HADA_Smoothen() ;
                 break ;
 			default:
                 m_curApp = nullptr;
