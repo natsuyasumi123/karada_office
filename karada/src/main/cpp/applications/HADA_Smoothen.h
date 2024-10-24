@@ -8,7 +8,7 @@
 #include <detail/type_mat4x4.hpp>
 #include <ByteFlowLock.h>
 #include "AppBase.h"
-
+//皮肤光滑
 class HADA_Smoothen : public AppBase
 {
 public:

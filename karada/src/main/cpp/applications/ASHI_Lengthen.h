@@ -20,6 +20,7 @@
 #define HORIZONTAL_STRETCH_RIGHT_6_POINTS  0x22
 #define HORIZONTAL_STRETCH_4_POINTS        0x23
 
+//长=》腿
 class ASHI_Lengthen : public AppBase
 {
 public:

@@ -7,7 +7,7 @@
 #include <detail/type_mat4x4.hpp>
 #include <ByteFlowLock.h>
 #include "AppBase.h"
-
+//纹身
 class IREZUMI_Stick : public AppBase
 {
 public:

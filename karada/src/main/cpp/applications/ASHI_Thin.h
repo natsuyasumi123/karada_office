@@ -8,7 +8,7 @@
 #include <detail/type_mat4x4.hpp>
 #include <ByteFlowLock.h>
 #include "AppBase.h"
-
+//瘦=》腿
 class ASHI_Thin : public AppBase
 {
 public:

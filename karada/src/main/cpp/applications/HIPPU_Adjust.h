@@ -8,7 +8,7 @@
 #include <detail/type_mat4x4.hpp>
 #include <ByteFlowLock.h>
 #include "AppBase.h"
-
+//髋部调整
 class HIPPU_Adjust : public AppBase
 {
 public:
