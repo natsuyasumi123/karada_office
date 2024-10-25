@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -120,6 +121,9 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         mRootView = findViewById(R.id.rootView);
         seekBar = findViewById(R.id.seekBar) ;
         dqView = findViewById(R.id.dqView) ;
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) dqView.getLayoutParams();
+        params.topMargin = 200;
+        dqView.setLayoutParams(params);
         mRootView.getViewTreeObserver().addOnGlobalLayoutListener(this);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mGLRender.init();
@@ -221,6 +225,9 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
                         mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.getWidth(), bitmap.getHeight(), byteArray , landMarks , faceMarks);//设置图片
                         if(mSampleSelectedIndex == 10){
                            mGLRender.addStickerByPath("/sdcard/sticker.png")  ;
+                           dqView.setVisibility(View.VISIBLE);
+                        }else{
+                            dqView.setVisibility(View.GONE);
                         }
                     }
                     if (mask != null) {

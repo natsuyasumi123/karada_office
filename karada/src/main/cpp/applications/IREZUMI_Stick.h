@@ -26,7 +26,6 @@ public:
 
 	void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int angleX, int angleY, float ratio);
 
-    void initHippuData();
 
     void addSticker(std::string path) override ;
     void setStickerVertices(float* vertices , int size) override ;

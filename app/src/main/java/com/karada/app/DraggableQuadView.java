@@ -30,15 +30,11 @@ public class DraggableQuadView extends View {
     // 判断点是否在四边形内部
     public static boolean isPointInQuadrilateral(
             float x , float y,
-            float x1 , float y1,
-            float x2 , float y2,
-            float x3 , float y3,
-            float x4 , float y4
-                                                 ) {
-        float cp1 = crossProduct(x, y  , x1 , y1 ,x2 , y2);
-        float cp2 = crossProduct(x, y  , x2 , y2 ,x3 , y3);
-        float cp3 = crossProduct(x, y  , x3 , y3 ,x4 , y4);
-        float cp4 = crossProduct(x, y  , x4 , y4 ,x1 , y1);
+            float[]  p ) {
+        float cp1 = crossProduct(x, y  , p[0] , p[1] ,p[2] , p[3]);
+        float cp2 = crossProduct(x, y  , p[2] , p[3] ,p[4] , p[5]);
+        float cp3 = crossProduct(x, y  , p[4] , p[5] ,p[6] , p[7]);
+        float cp4 = crossProduct(x, y  , p[6] , p[7] ,p[0] , p[1]);
         // 判断叉积的符号，如果所有的符号相同，则点在四边形内
         return (cp1 > 0 && cp2 > 0 && cp3 > 0 && cp4 > 0) || (cp1 < 0 && cp2 < 0 && cp3 < 0 && cp4 < 0);
     }
@@ -48,6 +44,7 @@ public class DraggableQuadView extends View {
 
     private static final int RADIUS = 20; // 点的半径
     private int draggingPoint = -1;       // 当前拖拽的点索引
+    private boolean draw = true ;
 
     public DraggableQuadView(Context context) {
         super(context);
@@ -88,12 +85,18 @@ public class DraggableQuadView extends View {
         paint.setStyle(Paint.Style.FILL_AND_STROKE);
         paint.setAntiAlias(true);
         path = new Path();
+
+//        setClickable(true);
+//        setOnClickListener(view -> {
+//            draw = !draw ;
+//            invalidate();
+//        });
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
+        if(!draw) return ;
         // 绘制四个点
         for (int i = 0; i < points.length; i += 2) {
             canvas.drawCircle(points[i], points[i + 1], RADIUS, paint);
@@ -114,7 +117,7 @@ public class DraggableQuadView extends View {
     }
 
     float lastX = 0 , lastY = 0 ;
-
+    private int moveCount = 0 ;
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -156,30 +159,43 @@ public class DraggableQuadView extends View {
                                 points[6] / sWidth , points[7] / sHeight
                         );
                     }
+                    moveCount ++ ;
                 }
                 break;
+            case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
                 // 拖拽结束
+                if(moveCount < 3 && draggingPoint < 0){
+                    draw = !draw ;
+                    invalidate();
+                }
+                moveCount = 0 ;
                 draggingPoint = -1;
                 break;
         }
 
-        return true;
+        return draggingPoint>= 0 || super.onTouchEvent(event) ;
     }
 
     // 检查触摸位置是否在某个点附近
     private int getTouchedPoint(float x, float y) {
+        float distance = 10000 ;
         for (int i = 0; i < points.length; i += 2) {
             float px = points[i];
             float py = points[i + 1];
-            if (Math.sqrt(Math.pow(x - px, 2) + Math.pow(y - py, 2)) <= RADIUS * 2) {
+            float dis = (float) Math.sqrt(Math.pow(x - px, 2) + Math.pow(y - py, 2));
+
+            if (dis <= RADIUS * 2) {
                 return i / 2;
             }
+            distance = Math.min(distance , dis) ;
         }
-        if (isPointInQuadrilateral(x , y , points[0] , points[1] , points[2] , points[3] , points[4] , points[5] , points[6] , points[7])){
+        if(distance < RADIUS * 10 || isPointInQuadrilateral(x , y , points))
+        {
             return 100 ;
         }
-        return 100;
+
+        return -1;
     }
 
     public interface VertexListener{

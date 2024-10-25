@@ -68,6 +68,7 @@ void IREZUMI_Stick::Init()
             "uniform vec2 bottomLeft;//value0:0;value1:100;restrict:false;is_uvs:0\n"
             "uniform vec2 bottomRight;//value0:100;value1:100;restrict:false;is_uvs:0\n"
             "uniform vec2 viewPort; \n"
+            "uniform float transparent; \n"
             "float cross2d(vec2 a, vec2 b)\n"
             "{\n"
             "    return (a.x * b.y) - (a.y * b.x);\n"
@@ -133,6 +134,7 @@ void IREZUMI_Stick::Init()
             "    }else{\n"
             "         stRGB =  texture(_STex, finalUV);\n"
             "    }"
+            "    stRGB.a = stRGB.a * transparent ;\n"
 //            "       SV_Target0 = texture(_MainTex , out_uvs) + stRGB;\n"
             "       SV_Target0 = mix(texture(_MainTex , out_uvs)  ,  stRGB , stRGB.a);\n"
             "}" ;
@@ -218,9 +220,6 @@ void IREZUMI_Stick::setStickerVertices(float * v , int size )  {
     }
 }
 
-void IREZUMI_Stick::initHippuData() {
-     //no need yet
-}
 
 void IREZUMI_Stick::Draw(int screenW, int screenH)
 {
@@ -275,8 +274,6 @@ void IREZUMI_Stick::Draw(int screenW, int screenH)
         return;
     }
 
-
-    initHippuData() ;
 	glViewport(0, 0, screenW, screenH);
 
 	UpdateMVPMatrix(m_MVPMatrix, m_AngleX, m_AngleY, (float)screenW / screenH);
@@ -292,18 +289,15 @@ void IREZUMI_Stick::Draw(int screenW, int screenH)
 	glUniform1i(m_SamplerLoc, 0);
 	glUniform1i(m_StickerLoc, 1);
 
-    //            "uniform vec2 topLeft;//value0:0;value1:0;restrict:false;is_uvs:0\n"
-    //            "uniform vec2 topRight;//value0:100;value1:0;restrict:false;is_uvs:0\n"
-    //            "uniform vec2 bottomLeft;//value0:0;value1:100;restrict:false;is_uvs:0\n"
-    //            "uniform vec2 bottomRight;//value0:100;value1:100;restrict:false;is_uvs:0\n"
-    float ratio = degree * 30 ;
-//    GLUtils::setVec2(m_ProgramObj, "viewPort", m_RenderImage.width, m_RenderImage.height);
+    float ratio = degree * 2 ;
+    GLUtils::setVec2(m_ProgramObj, "viewPort", m_RenderImage.width, m_RenderImage.height);
     GLUtils::setVec2(m_ProgramObj, "topLeft", vertices[0], vertices[1]);
     GLUtils::setVec2(m_ProgramObj, "topRight", vertices[2], vertices[3]);
     GLUtils::setVec2(m_ProgramObj, "bottomLeft", vertices[6], vertices[7]);
     GLUtils::setVec2(m_ProgramObj, "bottomRight", vertices[4], vertices[5]);
 
     GLUtils::setVec2(m_ProgramObj, "viewPort", screenW, screenH);
+    GLUtils::setFloat(m_ProgramObj, "transparent", ratio);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void *)0);
 }
