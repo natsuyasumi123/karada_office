@@ -164,24 +164,74 @@ void MyGLRenderContext::setDegree(float degree){
         break ;
         case 2 :{ // 眼睛
             kData[0 *3 + 0 ] = faceData[index][468 *3 ] * imageWidth ;
+            if(kData[0*3 + 0 ]  == 0){
+                kData[0 *3 + 0 ] =karadaData[index][5 *3 ] * imageWidth ;
+            }
             kData[0 *3 + 1] = faceData[index][468 *3  + 1 ] * imageHeight ;
+            if(kData[0*3 + 1 ]  == 0){
+                kData[0 *3 + 1 ] =karadaData[index][5 *3 +1] * imageHeight ;
+            }
             kData[1 *3 + 0] = faceData[index][473 *3 ]   * imageWidth ;
+            if(kData[1*3 + 0 ]  == 0){
+                kData[1 *3 + 0 ] =karadaData[index][2 *3] * imageWidth ;
+            }
             kData[1 *3 + 1] = faceData[index][473 *3 +1]  * imageHeight ;
-            kData[2 *3 + 0] = (faceData[index][133 *3 ] - faceData[index][130 *3 ] ) *imageWidth;
-            kData[2 *3 + 1] = (faceData[index][263 *3 ] - faceData[index][463 *3 ] )* imageWidth;
+            if(kData[1*3 + 1 ]  == 0){
+                kData[1 *3 + 1 ] =karadaData[index][2 *3 +1] * imageHeight ;
+            }
+
+
+            kData[2 *3 + 0] = std::abs((faceData[index][133 *3 ] - faceData[index][130 *3 ] )) *imageWidth;
+            if(kData[2*3 + 0 ]  == 0){
+                kData[2 *3 + 0 ] =(karadaData[index][4 *3 ] - karadaData[index][6 *3])* imageWidth * 2; //识别不准确， 增加眼睛范围
+            }
+            kData[2 *3 + 1] = std::abs((faceData[index][263 *3 ] - faceData[index][463 *3 ] ))* imageWidth;
+            if(kData[2*3 + 1 ]  == 0){
+                kData[2 *3 + 1 ] =(karadaData[index][3 *3 ] - karadaData[index][1 *3])* imageWidth *2 ;//识别不准确， 增加眼睛范围
+            }
         }
         break ;
         case 3 :{ //脸
             kData[0 *3 + 0] = faceData[index][127 *3 ] * imageWidth ;
+            if(kData[0*3 + 0 ]  == 0){
+                kData[0 *3 + 0 ] =(karadaData[index][8 *3 ] )* imageWidth ;//识别不准确， 增加眼睛范围
+            }
             kData[0 *3 + 1] = faceData[index] [127 *3  + 1 ] * imageHeight ;
+            if(kData[0*3 + 1 ]  == 0){
+                kData[0 *3 + 1 ] =(karadaData[index][8 *3 +1 ])* imageHeight ;//识别不准确， 增加眼睛范围
+            }
             kData[1 *3 + 0] =faceData[index][152 *3 ]  * imageWidth ;
+            if(kData[1*3 + 0 ]  == 0){
+                kData[1 *3 + 0 ] =(karadaData[index][0 *3 ] )* imageWidth ;//识别不准确， 增加眼睛范围
+            }
             kData[1 *3 + 1] =faceData[index][152 *3 +1]  * imageHeight ;
+            if(kData[1*3 + 1 ]  == 0){
+                kData[1 *3 + 1 ] =(karadaData[index][10 *3 + 1]   + karadaData[index][9 *3 + 1]   - karadaData[index][0 *3 + 1])* imageHeight ;//识别不准确， 增加眼睛范围
+            }
             kData[2*3 +0] =faceData[index][356 *3 ] * imageWidth ;
+            if(kData[2*3 + 0 ]  == 0){
+                kData[2 *3 + 0 ] =(karadaData[index][7 *3 ] )* imageWidth;//识别不准确， 增加眼睛范围
+            }
             kData[2*3 +1] =faceData[index][356 *3 +1] * imageHeight ;
+            if(kData[2*3 + 1 ]  == 0){
+                kData[2 *3 + 1 ] =(karadaData[index][7 *3  +1] )* imageHeight ;//识别不准确， 增加眼睛范围
+            }
             kData[3*3 +0] =faceData[index][58 *3 ] * imageWidth ;
+            if(kData[3*3 + 0 ]  == 0){
+                kData[3 *3 + 0 ] =(karadaData[index][10 *3] *2  - karadaData[index][0 *3 ] )* imageWidth ;//识别不准确， 增加眼睛范围
+            }
             kData[3*3 +1] =faceData[index][58 *3 +1 ]  * imageHeight ;
+            if(kData[3*3 + 1 ]  == 0){
+                kData[3 *3 + 1 ] =(karadaData[index][10 *3  +1] )* imageHeight;//识别不准确， 增加眼睛范围
+            }
             kData[4*3 +0] =faceData[index][367 *3 ] * imageWidth  ;
+            if(kData[4*3 + 0 ]  == 0){
+                kData[4 *3 + 0 ] =(2 *karadaData[index][9 *3 ] - karadaData[index][0 *3])* imageWidth  ;//识别不准确， 增加眼睛范围
+            }
             kData[4*3 +1] =faceData[index][367 *3 +1 ] * imageHeight ;
+            if(kData[4*3 + 1 ]  == 0){
+                kData[4 *3 + 1 ] =(karadaData[index][9 *3 +1 ] )* imageHeight;//识别不准确， 增加眼睛范围
+            }
             break ;
         case 4:{ //髋部
             kData[0 *3 + 0] = karadaData[index][24 *3  ] * imageWidth ;

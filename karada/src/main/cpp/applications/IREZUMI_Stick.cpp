@@ -224,9 +224,7 @@ void IREZUMI_Stick::setStickerVertices(float * v , int size )  {
 void IREZUMI_Stick::Draw(int screenW, int screenH)
 {
 	LOGCATE("IREZUMI_Stick::Draw() [w,h]=[%d,%d]", screenW, screenH);
-
 	if(m_ProgramObj == GL_NONE) return;
-
 	if(m_TextureId == GL_NONE)
     {
         ScopedSyncLock lock(&m_Lock);
@@ -257,8 +255,6 @@ void IREZUMI_Stick::Draw(int screenW, int screenH)
                     format = GL_RGB;
                 else if (nrChannels == 4)
                     format = GL_RGBA;
-
-
                 glBindTexture(GL_TEXTURE_2D , m_StickerID);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -289,7 +285,7 @@ void IREZUMI_Stick::Draw(int screenW, int screenH)
 	glUniform1i(m_SamplerLoc, 0);
 	glUniform1i(m_StickerLoc, 1);
 
-    float ratio = degree * 2 ;
+    float ratio = 1.0 - degree ;
     GLUtils::setVec2(m_ProgramObj, "viewPort", m_RenderImage.width, m_RenderImage.height);
     GLUtils::setVec2(m_ProgramObj, "topLeft", vertices[0], vertices[1]);
     GLUtils::setVec2(m_ProgramObj, "topRight", vertices[2], vertices[3]);

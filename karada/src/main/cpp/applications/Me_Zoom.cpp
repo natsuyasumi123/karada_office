@@ -211,7 +211,7 @@ void Me_Zoom::Draw(int screenW, int screenH)
 	glBindTexture(GL_TEXTURE_2D, m_TextureId);
 	glUniform1i(m_SamplerLoc, 0);
 
-    float offset = degree  ;
+    float offset = degree /2 ;
 
 	GLUtils::setFloat(m_ProgramObj, "u_ScaleRatio", offset * 1.6f);
 	GLUtils::setFloat(m_ProgramObj, "u_Radius", EyeRadius);

@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
             "髋HIPPU ADJUST",
             "腹NAKA TRIM" ,
             "腿ASHI LENGTHEN",
-            "腿ASHI THIN" ,
+            "TODO THIN" ,
             "手A-MU THIN",
             "肌HADA SMOOTHEN" ,
             "纹身IREZUMI STICK"
@@ -147,8 +147,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
         dqView.setInitPoints(initPoints);
         dqView.setVertextListener(this);
         CommonUtils.copyAssetsDirToSDCard(this,"image" ,defaultPath   ) ;
-        //showFilePath = defaultPath + "image/test.PNG" ;
-        showFilePath = defaultPath + "image/e.jpg" ;
+        showFilePath = defaultPath + "image/y.jpg" ;
         showImage(  showFilePath , selectedUri) ;
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -353,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements ViewTreeObserver.
             FaceLandmarkerResult faceRet = facemarker.detect(mpImage) ;
             List<List<NormalizedLandmark>> faceMarks = faceRet.faceLandmarks();
             float [][] faceArray = CommonUtils.convertListToArray(faceMarks) ;
-
+//            saveToTxt(faceArray[0] , "faceArray.txt");
 
             ImageSegmenterResult result = imagesegmenter.segment(mpImage) ;
             Optional<MPImage> cateMaskOpt = result.categoryMask();

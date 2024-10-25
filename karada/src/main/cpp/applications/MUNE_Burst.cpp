@@ -49,10 +49,10 @@ void MUNE_Burst::initMuneData() {
         brestLeftPoint[1] = muneData[0 *3 + 1] ;
         rightBreastPoint[0] = muneData[1 *3 ] ;
         rightBreastPoint[1] = muneData[1 *3  +1] ;
-        int imageWidth= 0 , imageHeight = 0 ;
-        MyGLRenderContext::GetInstance()->getImageSize(imageWidth , imageHeight) ;
+//        int imageWidth= 0 , imageHeight = 0 ;
+//        MyGLRenderContext::GetInstance()->getImageSize(imageWidth , imageHeight) ;
         int muneHorizonDiffer = rightBreastPoint[0] - brestLeftPoint[0] ;
-        breastSize = muneHorizonDiffer  ;
+        breastSize = muneHorizonDiffer * 2  ;
         LOGCATE("MUNE_Burst::Init create program fail");
     }
 }
